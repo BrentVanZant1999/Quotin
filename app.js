@@ -1,4 +1,3 @@
-//app.js
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
@@ -13,83 +12,133 @@ console.log("Server started.");
 
 var SOCKET_LIST = {};
 
-var PlayerObject = function(){
+var Entity = function(){
     var self = {
         room:-1,
-        lastString:"",
         points:0,
+        id:"",
         name:"",
-        id:0,
     }
-    self.updatePoints = function(pointsAdded){
-        self.points += pointsAdded;
+    self.updatePoints = function(inputPoints){
+        self.points += self.inputPoints;
     }
     return self;
 }
 
-var Player = function(nameVar, idNum){
-    var self = PlayerObject();
-    self.name = nameVar;
-    self.id = idNum;
-    self.room = 0;
+var Player = function(id){
+    var self = Entity();
+    self.id = id;
+    self.name = "";
     self.points = 0;
-
-    self.addPoints = function(pointsToAdd) {
-      self.updatePoints(pointsToAdd);
+    self.addPoints = function(points){
+      self.updatePoints(points);
     }
-    Player.list[idNum] = self;
+    Player.list[id] = self;
     return self;
 }
-//define a list of all players currently online.
+
 Player.list = {};
 
-Player.onConnect = function(name,socket){
-    var player = Player(name, socket.id);
+Player.onConnect = function(socket){
+    var player = Player(socket.id);
     socket.on('keyPress',function(data){
+      /*
         if(data.inputId === 'left')
             player.pressingLeft = data.state;
-        else if(data.inputId === 'right')
-            player.pressingRight = data.state;
-        else if(data.inputId === 'up')
-            player.pressingUp = data.state;
-        else if(data.inputId === 'down')
-            player.pressingDown = data.state;
+      */
     });
 }
-
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
 }
 
 
 var DEBUG = true;
-var socketCounter = 0;
+
+var USERS = {
+    //username:password
+    "Brent":"password",
+    "bob2":"bob",
+    "bob3":"ttt",
+}
+
+var isValidPassword = function(data,cb){
+    setTimeout(function(){
+        cb(USERS[data.username] === data.password);
+    },10);
+}
+var isUsernameTaken = function(data,cb){
+    setTimeout(function(){
+        cb(USERS[data.username]);
+    },10);
+}
+var addUser = function(data,cb){
+    setTimeout(function(){
+        USERS[data.username] = data.password;
+        cb();
+    },10);
+}
+
 var io = require('socket.io')(serv,{});
-io.sockets.on('connection', function(socket) {
-    socket.id = socketCounter;
-    socketCounter++;
+io.sockets.on('connection', function(socket){
+    socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
 
-    socket.on('disconnect',function() {
+    socket.on('signIn',function(data){
+        isValidPassword(data,function(res){
+            if(res){
+                Player.onConnect(socket);
+                socket.emit('signInResponse',{success:true});
+            } else {
+                socket.emit('signInResponse',{success:false});
+            }
+        });
+    });
+    socket.on('signUp',function(data){
+        isUsernameTaken(data,function(res){
+            if(res){
+                socket.emit('signUpResponse',{success:false});
+            } else {
+                addUser(data,function(){
+                    socket.emit('signUpResponse',{success:true});
+                });
+                Player.onConnect(socket);
+                socket.emit('signInResponse',{success:true});
+            }
+        });
+    });
+
+    socket.on('disconnect',function(){
         delete SOCKET_LIST[socket.id];
         Player.onDisconnect(socket);
     });
 
-    socket.on('sendMsgToServer',function(data) {
-        var playerName = Player.list[socket.id].name;
+    socket.on('sendMsgToServer',function(data){
+        var playerName = ("" + socket.id).slice(2,7);
         for(var i in SOCKET_LIST){
             SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
         }
     });
 
-    socket.on('evalServer',function(data) {
+    socket.on('evalServer',function(data){
         if(!DEBUG)
             return;
         var res = eval(data);
         socket.emit('evalAnswer',res);
     });
+
+
+
 });
 
 setInterval(function(){
-  //interval actions
+    var pack = {
+        player:Player.update(),
+        bullet:Bullet.update(),
+    }
+
+    for(var i in SOCKET_LIST){
+        var socket = SOCKET_LIST[i];
+        socket.emit('newPositions',pack);
+    }
 },1000/25);
