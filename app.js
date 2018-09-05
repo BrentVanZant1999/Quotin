@@ -45,11 +45,8 @@ Player.list = {};
 
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
-    socket.on('keyPress',function(data){
-      /*
-        if(data.inputId === 'left')
-            player.pressingLeft = data.state;
-      */
+    socket.on('roomButton',function(data){
+      var gotoRoom = function(socket,data.roomNumber);
     });
 }
 Player.onDisconnect = function(socket){

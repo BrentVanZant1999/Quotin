@@ -67,6 +67,22 @@
     var gameButton = document.getElementById('game-chat-button');
     var bookButton = document.getElementById('book-chat-button');
 
+    generalButton.onclick = function(){
+        socket.emit('roomButton',{roomNumber:0});
+    }
+    movieButton.onclick = function(){
+        socket.emit('roomButton',{roomNumber:1});
+    }
+
+    gameButton.onclick = function(){
+        socket.emit('roomButton',{roomNumber:2});
+    }
+
+    bookButton.onclick = function(){
+        socket.emit('roomButton',{roomNumber:3});
+    }
+
+
     var ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
 
