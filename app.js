@@ -20,23 +20,47 @@ var DISPLAY_TIME = 2500;
 var RESULTS_TIME = 5000;
 var GAME_RESULTS_TIME = 10000;
 var GAME_START_TIME = 5000;
-var GAME_ENDING_STRING = "---Game Ending---"
+var GAME_ENDING_STRING = "---Game Ending---";
+var GAME_STARTING_STRING = "Game Starting in ";
+var GAME_OVER_STRING = "Game is over, new game starting in "
 var Game = function(typeNum){
   var self = {
       type:typeNum,
       currentString:"test quote",
+      promptString:"",
       acceptedAnswer:"Alexander Hamilton",
       isActive:false, //handles if is in guessing stage
       firstPlace:undefined,
       secondPlace:undefined,
       thirdPlace:undefined,
       round:0,
+      timeDisplayLeft: 0,
       timeLeft:0,
-      timePhase:0, // 0 game starting, 1 guesing, 2 results, 3 game results
+      timePhase:0, // 0 game starting, 1 guesing, 2 guessing part two, 3 results, 4 game results
       isOver:false
   }
   var displayString = function(){
-    //display quote string
+    //handle displaying preround
+    if (timePhase == 0) {
+
+    }
+    if (timePhase == 1 || timePhase == 2) {
+      if (type == 0 ){
+        for (var i in MOVIE_LIST) {
+          socket.emit(stringToDisplay, { promptString:self.promptString} );
+        }
+      }
+      else if ( type == 1 ) {
+        for (var i in GAME_LIST) {
+            socket.emit(stringToDisplay, { promptString:self.promptString});
+        }
+      }
+      else if ( type == 2 ) {
+        for (var i in GAME_LIST) {
+            socket.emit(stringToDisplay, { promptString:self.promptString});
+        }
+      }
+    }
   }
   var passTime = function(timePassed){
     //handle the passing of time
