@@ -6,7 +6,10 @@
 </div>
 
 <div id="gameDiv" style="display:none;">
-    <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+    <div id="quoteArea">"I am a quote"</div>
+
+    <input id="submit-input" placeholder="guess" type="text" style="width:500px"></input>
+    <button id="submit-input-button">Submit</button>
 
     <div id="roomDisplay"></div>
     <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
@@ -15,12 +18,14 @@
     <form id="chat-form">
         <input id="chat-input" type="text" style="width:500px"></input>
     </form>
-
+    <div id ="playerRank">-4. Brent 13 pts</div>
     <button id="general-chat-button">General Chat</button>
     <button id="movie-chat-button">Movie Chat</button>
     <button id="game-chat-button">Game Chat</button>
     <button id="book-chat-button">Book Chat</button>
-
+    <div id ="rank1Display">-1. Brandt 13 pts</div>
+    <div id ="rank2Display">-2. Boy 13 pts</div>
+    <div id ="rank3Display">-3. Butt 13 pts</div>
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>

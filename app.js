@@ -15,6 +15,57 @@ var GAME_LIST = {};
 var BOOK_LIST = {};
 var MOVIE_LIST = {};
 
+var GUESSING_TIME = 15000;
+var DISPLAY_TIME = 2500;
+var RESULTS_TIME = 5000;
+var GAME_RESULTS_TIME = 10000;
+var GAME_START_TIME = 5000;
+var GAME_ENDING_STRING = "---Game Ending---"
+var Game = function(typeNum){
+  var self = {
+      type:typeNum,
+      currentString:"test quote",
+      acceptedAnswer:"Alexander Hamilton",
+      isActive:false, //handles if is in guessing stage
+      firstPlace:undefined,
+      secondPlace:undefined,
+      thirdPlace:undefined,
+      round:0,
+      timeLeft:0,
+      timePhase:0, // 0 game starting, 1 guesing, 2 results, 3 game results
+      isOver:false
+  }
+  var displayString = function(){
+    //display quote string
+  }
+  var passTime = function(timePassed){
+    //handle the passing of time
+  }
+  var displayLeaderBoard = function(){
+    //display the leaderboard
+  }
+  var displayPlayerStats = function(socket){
+    //display the players stats
+  }
+  var updateRound = function() {
+    //call update answer depending on game type
+  }
+  var updateAnswer = function(quote,word) {
+
+  }
+  var endGame = function(socket) {
+
+  }
+  var handleSubmission = function(player, answer) {
+
+  }
+  return self;
+}
+
+var gameGame = Game(0);
+var bookGame = Game(1);
+var movieGame = Game(2);
+
 var Entity = function(){
     var self = {
         room:-1,
@@ -48,6 +99,18 @@ Player.onConnect = function(socket, playerName){
     socket.on('roomButton',function(data){
       gotoRoom(socket,data.roomNumber);
     });
+    socket.on('answerSubmit',function(data){
+      var answer = data.answer;
+      if (player.room == 1){
+        movieGame.handleSubmission(player, answer)
+      }
+      else if (player.room == 2){
+        gameGame.handleSubmission(player,answer)
+      }
+      else if (player.room == 3){
+        bookGame.handleSubmission(player,answer)
+      }
+    });
 }
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
@@ -57,10 +120,8 @@ Player.onDisconnect = function(socket){
 var DEBUG = true;
 
 var USERS = {
-    //username:password
+    //username:password structures
     "Brent":"password",
-    "bob2":"bob",
-    "bob3":"ttt",
 }
 var gotoRoom= function(socket,roomNumber){
   delete GENERAL_LIST[socket.id];
@@ -174,13 +235,10 @@ io.sockets.on('connection', function(socket){
         var res = eval(data);
         socket.emit('evalAnswer',res);
     });
-
-
-
 });
 
 setInterval(function(){
-  /*
-   * Interval Functions
-   */
+  gameGame.passTime(1000/25);
+  bookGame.passTime(1000/25);
+  movieGame.passTime(1000/25);
 },1000/25);
