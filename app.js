@@ -8,9 +8,12 @@ app.get('/',function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(2000);
-console.log("Server started.");
 
 var SOCKET_LIST = {};
+var GENERAL_LIST = {};
+var GAME_LIST = {};
+var BOOK_LIST = {};
+var MOVIE_LIST = {};
 
 var Entity = function(){
     var self = {
@@ -25,11 +28,12 @@ var Entity = function(){
     return self;
 }
 
-var Player = function(id){
+var Player = function(id, playerName){
     var self = Entity();
     self.id = id;
-    self.name = "";
+    self.name = playerName;
     self.points = 0;
+    self.room = 0;
     self.addPoints = function(points){
       self.updatePoints(points);
     }
@@ -39,8 +43,8 @@ var Player = function(id){
 
 Player.list = {};
 
-Player.onConnect = function(socket){
-    var player = Player(socket.id);
+Player.onConnect = function(socket, playerName){
+    var player = Player(socket.id, playerName);
     socket.on('keyPress',function(data){
       /*
         if(data.inputId === 'left')
@@ -60,6 +64,32 @@ var USERS = {
     "Brent":"password",
     "bob2":"bob",
     "bob3":"ttt",
+}
+var gotoRoom= function(socket,roomNumber){
+  delete GENERAL_LIST[socket.id];
+  delete MOVIE_LIST[socket.id];
+  delete GAME_LIST[socket.id];
+  delete BOOK_LIST[socket.id];
+  if (roomNumber == 0 ) {
+    GENERAL_LIST[socket.id] = socket;
+    Player.list[socket.id].room = 0;
+    socket.emit('changeRoom',{roomName:"General Chat"});
+  }
+  else if (roomNumber == 1 ) {
+    MOVIE_LIST[socket.id] = socket;
+    Player.list[socket.id].room = 1;
+    socket.emit('changeRoom',{roomName:"Movie Chat"});
+  }
+  else if (roomNumber == 2 ) {
+    GAME_LIST[socket.id] = socket;
+    Player.list[socket.id].room = 2;
+    socket.emit('changeRoom',{roomName:"Game Chat"});
+  }
+  else if (roomNumber == 3 ) {
+    BOOK_LIST[socket.id] = socket;
+    Player.list[socket.id].room = 3;
+    socket.emit('changeRoom',{roomName:"Book Chat"});
+  }
 }
 
 var isValidPassword = function(data,cb){
@@ -83,11 +113,11 @@ var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
-
     socket.on('signIn',function(data){
         isValidPassword(data,function(res){
             if(res){
-                Player.onConnect(socket);
+                Player.onConnect(socket, data.username);
+                gotoRoom(socket, 0);
                 socket.emit('signInResponse',{success:true});
             } else {
                 socket.emit('signInResponse',{success:false});
@@ -102,7 +132,8 @@ io.sockets.on('connection', function(socket){
                 addUser(data,function(){
                     socket.emit('signUpResponse',{success:true});
                 });
-                Player.onConnect(socket);
+                Player.onConnect(socket, data.username);
+                gotoRoom(socket, 0);
                 socket.emit('signInResponse',{success:true});
             }
         });
@@ -114,9 +145,29 @@ io.sockets.on('connection', function(socket){
     });
 
     socket.on('sendMsgToServer',function(data){
-        var playerName = ("" + socket.id).slice(2,7);
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
+        var playerName = Player.list[socket.id].name;
+        var roomNumber = Player.list[socket.id].room;
+        if (roomNumber == 0 ) {
+          for(var i in GENERAL_LIST){
+              GENERAL_LIST[i].emit('addToChat',playerName + ': ' + data);
+          }
+
+        }
+        else if (roomNumber == 1 ) {
+          for(var i in MOVIE_LIST){
+            MOVIE_LIST[i].emit('addToChat',playerName + ': ' + data);
+          }
+        }
+        else if (roomNumber == 2 ) {
+
+          for(var i in GAME_LIST){
+            GAME_LIST[i].emit('addToChat',playerName + ': ' + data);
+          }
+        }
+        else if (roomNumber == 3 ) {
+          for(var i in BOOK_LIST){
+            BOOK_LIST[i].emit('addToChat',playerName + ': ' + data);
+          }
         }
     });
 
@@ -132,13 +183,7 @@ io.sockets.on('connection', function(socket){
 });
 
 setInterval(function(){
-    var pack = {
-        player:Player.update(),
-        bullet:Bullet.update(),
-    }
-
-    for(var i in SOCKET_LIST){
-        var socket = SOCKET_LIST[i];
-        socket.emit('newPositions',pack);
-    }
+  /*
+   * Interval Functions
+   */
 },1000/25);
