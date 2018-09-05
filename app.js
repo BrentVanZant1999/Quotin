@@ -46,7 +46,7 @@ Player.list = {};
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
     socket.on('roomButton',function(data){
-      var gotoRoom = function(socket,data.roomNumber);
+      gotoRoom(socket,data.roomNumber);
     });
 }
 Player.onDisconnect = function(socket){
