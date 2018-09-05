@@ -22,7 +22,8 @@ var GAME_RESULTS_TIME = 10000;
 var GAME_START_TIME = 5000;
 var GAME_ENDING_STRING = "---Game Ending---";
 var GAME_STARTING_STRING = "Game Starting in ";
-var GAME_OVER_STRING = "Game is over, new game starting in "
+var GAME_OVER_STRING = "Game is over, new game starting in ";
+var ROUND_OVER_STRING = "Round finished, new round starting in ";
 var Game = function(typeNum){
   var self = {
       type:typeNum,
@@ -42,9 +43,24 @@ var Game = function(typeNum){
   var displayString = function(){
     //handle displaying preround
     if (timePhase == 0) {
-
+        if (type == 0){
+          for (var i in MOVIE_LIST) {
+            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+          }
+        }
+        if (type == 1){
+          for (var i in GAME_LIST) {
+            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+          }
+        }
+        if (type == 2){
+          for (var i in GAME_LIST) {
+            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+          }
+        }
     }
-    if (timePhase == 1 || timePhase == 2) {
+    //handle displaying quote string
+   if (timePhase == 1 || timePhase == 2) {
       if (type == 0 ){
         for (var i in MOVIE_LIST) {
           socket.emit(stringToDisplay, { promptString:self.promptString} );
@@ -61,9 +77,60 @@ var Game = function(typeNum){
         }
       }
     }
+    //hand displaying end round
+    if (timePhase == 3) {
+       if (type == 0 ){
+         for (var i in MOVIE_LIST) {
+           socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft } );
+         }
+       }
+       else if ( type == 1 ) {
+         for (var i in GAME_LIST) {
+             socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft  });
+         }
+       }
+       else if ( type == 2 ) {
+         for (var i in GAME_LIST) {
+             socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft});
+         }
+       }
+     }
+    //handle displaying end game  GAME_OVER_STRING
+    if (timePhase == 4) {
+       if (type == 0 ){
+         for (var i in MOVIE_LIST) {
+           socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft } );
+         }
+       }
+       else if ( type == 1 ) {
+         for (var i in GAME_LIST) {
+             socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft  });
+         }
+       }
+       else if ( type == 2 ) {
+         for (var i in GAME_LIST) {
+             socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft});
+         }
+       }
+     }
   }
+
   var passTime = function(timePassed){
-    //handle the passing of time
+    self.timeLeft -= timePassed;
+    if ( self.timeLeft <= 0 ) {
+      self.timeLeft = 1000;
+      self.handleSecond();
+    }
+  }
+
+  var handleSecond(){
+    if (self.timeDisplayLeft>0){
+      self.timeDisplayLeft--;
+      if (self.timeDisplayLeft == 0) {
+        
+      }
+    }
+
   }
   var displayLeaderBoard = function(){
     //display the leaderboard
