@@ -27,15 +27,13 @@ var Game = function(typeNum){
   //define self
   var self = {
       playerCount:0,
-      leaderBoard:[],
       type:typeNum,
       currentString:"test quote",
       promptString:"",
       acceptedAnswer:"Alexander Hamilton",
       isActive:false, //handles if is in guessing stage
-      firstPlace:undefined,
-      secondPlace:undefined,
-      thirdPlace:undefined,
+      firstPlaceSocket:undefined,
+      firstPlaceScore:0,
       round:0,
       timeDisplayLeft: 0,
       timeLeft:0,
@@ -168,55 +166,76 @@ var Game = function(typeNum){
   }
   //display top 3 players
   self.displayLeaderBoard = function(){
-    if ( self.type == 0 ){
-      for (var i in MOVIE_LIST) {
-        if  (self.firstPlace != undefined) {
-          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
-        }
-        if  (self.secondPlace != undefined) {
-          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
-        }
-        if  (self.thirdPlace != undefined) {
-          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+    if  (self.firstPlaceSocket != undefined) {
+      var playerName = Player.list[self.firstPlaceSocket].name;
+      var playerPoints = Player.list[self.firstPlaceSocket].points;
+      if ( self.type == 0 ){
+        for (var i in MOVIE_LIST) {
+          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
         }
       }
-    }
-    else if ( self.type == 1 ) {
-      for (var i in GAME_LIST) {
-        if  (self.firstPlace != undefined) {
-          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
-        }
-        if  (self.secondPlace != undefined) {
-          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
-        }
-        if  (self.thirdPlace != undefined) {
-          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+      else if ( self.type == 1 ) {
+        for (var i in GAME_LIST) {
+          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
         }
       }
-    }
-    else if ( self.type == 2 ) {
-      for (var i in GAME_LIST) {
-        if  (self.firstPlace != undefined) {
-          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
-        }
-        if  (self.secondPlace != undefined) {
-          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
-        }
-        if  (self.thirdPlace != undefined) {
-          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+      else if ( self.type == 2) {
+        for (var i in BOOK_LIST) {
+          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
         }
       }
     }
   }
 
   self.updateLeaderBoard = function() {
-
+    var highSocket = undefined;
+    var highScore = 0;
+    if ( self.type == 0 ){
+      for (var i in MOVIE_LIST) {
+        var playerNext = Player.list[i];
+        var scoreNext = playerNext.points;
+        if  (scoreNext > highScore) {
+          highScore = scoreNext;
+          highSocket = i;
+        }
+      }
+    }
+    else if ( self.type == 1 ) {
+      for (var i in GAME_LIST) {
+        var playerNext = Player.list[i];
+        var scoreNext = playerNext.points;
+        if  (scoreNext > highScore) {
+          highScore = scoreNext;
+          highSocket = i;
+        }
+      }
+    }
+    else if ( self.type == 2 ) {
+      for (var i in GAME_LIST) {
+        var playerNext = Player.list[i];
+        var scoreNext = playerNext.points;
+        if  (scoreNext > highScore) {
+          highScore = scoreNext;
+          highSocket = i;
+        }
+      }
+    }
+    self.firstPlaceScore = highScore;
+    self.firstPlaceSocket = highSocket;
   }
-  self.updateRound = function() {
-    //call update answer depending on game type
-  }
-  self.updateAnswer = function(quote,word) {
 
+  self.newRound = function() {
+    //call update essentials depending on game type
+    self.updateEssentials(self.type);
+    self.updateLeaderBoard();
+    self.displayLeaderBoard();
+  }
+  self.updateEssentials = function(type) {
+    if (type == 0){
+      var randomNum =0; //generate a random number from array length
+      self.acceptedAnswer = 0; //create an answer array for each type
+      self.currentString = 0; //and a quote array
+    }
   }
   self.endGame = function(socket) {
 

@@ -63,17 +63,42 @@
           </div>
           <div class="row">
             <div class="col">
-              <div id="feedbackArea" class="neutralColor">"Enter the book it's from"</div>
+              <div id="feedbackArea" class="negativeColor">You got it! You get 12 points.</div>
             </div>
           </div>
           <div class="row">
             <div class="col">
-                <input id="submit-input" placeholder="guess" type="text" style="width:300px"></input>
+              <input id="submit-input" placeholder="guess" type="text" style="width:300px"></input>
             </div>
           </div>
           <div class="row">
             <div class="col">
               <button id="submit-input-button">Submit</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="labelFor">Chat Room</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div id="chat-text" style="width:300px;height:200px;overflow:hidden">
+                <span>hello</span>
+              </div>
+              <form id="chat-form">
+                  <input id="chat-input" type="text" style="width:300px"></input>
+              </form>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div>1- <span id="topName"></span> -<span id="topPoints"></span> points</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div id="playerData" class="positiveColor" >12- - points</div>
             </div>
           </div>
         </div>
@@ -86,7 +111,7 @@
       <input id="submit-input" placeholder="guess" type="text" style="width:500px"></input>
       <button id="submit-input-button">Submit</button>
 
-      <div id="roomDisplay"></div>
+
       <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
       </div>
 
