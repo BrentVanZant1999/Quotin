@@ -15,17 +15,20 @@ var GAME_LIST = {};
 var BOOK_LIST = {};
 var MOVIE_LIST = {};
 
-var GUESSING_TIME = 15000;
-var DISPLAY_TIME = 2500;
-var RESULTS_TIME = 5000;
-var GAME_RESULTS_TIME = 10000;
-var GAME_START_TIME = 5000;
+var GUESSING_TIME = 15;
+var DISPLAY_TIME = 5;
+var RESULTS_TIME = 5;
 var GAME_ENDING_STRING = "---Game Ending---";
 var GAME_STARTING_STRING = "Game Starting in ";
 var GAME_OVER_STRING = "Game is over, new game starting in ";
 var ROUND_OVER_STRING = "Round finished, new round starting in ";
+
+//define game object
 var Game = function(typeNum){
+  //define self
   var self = {
+      playerCount:0,
+      leaderBoard:[],
       type:typeNum,
       currentString:"test quote",
       promptString:"",
@@ -37,77 +40,86 @@ var Game = function(typeNum){
       round:0,
       timeDisplayLeft: 0,
       timeLeft:0,
-      timePhase:0, // 0 game starting, 1 guesing, 2 guessing part two, 3 results, 4 game results
+      timePhase:0, // 0 game starting, 1 guesing, 2 results, 3 game results
       isOver:false
   }
-  var displayString = function(){
+  //add a player to count
+  self.addPlayer = function(){
+    self.playerCount++;
+  }
+  //remove a player from count
+  self.removePlayer = function(){
+    self.playerCount--;
+  }
+  //through displayString
+  self.displayString = function(){
     //handle displaying preround
-    if (timePhase == 0) {
-        if (type == 0){
+    if (self.timePhase == 0) {
+        if (self.type == 0){
           for (var i in MOVIE_LIST) {
             socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
           }
         }
-        if (type == 1){
+        if (self.type == 1){
           for (var i in GAME_LIST) {
             socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
           }
         }
-        if (type == 2){
+        if (self.type == 2){
           for (var i in GAME_LIST) {
             socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
           }
         }
     }
     //handle displaying quote string
-   if (timePhase == 1 || timePhase == 2) {
-      if (type == 0 ){
+   if (self.timePhase == 1 ) {
+      if (self.type == 0 ){
         for (var i in MOVIE_LIST) {
           socket.emit(stringToDisplay, { promptString:self.promptString} );
         }
       }
-      else if ( type == 1 ) {
+      else if ( self.type == 1 ) {
         for (var i in GAME_LIST) {
             socket.emit(stringToDisplay, { promptString:self.promptString});
         }
       }
-      else if ( type == 2 ) {
+      else if ( self.type == 2 ) {
         for (var i in GAME_LIST) {
             socket.emit(stringToDisplay, { promptString:self.promptString});
         }
       }
     }
     //hand displaying end round
-    if (timePhase == 3) {
-       if (type == 0 ){
+    if (self.timePhase == 2) {
+       if (self.type == 0 ){
          for (var i in MOVIE_LIST) {
            socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft } );
          }
        }
-       else if ( type == 1 ) {
+       else if ( self.type == 1 ) {
          for (var i in GAME_LIST) {
              socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft  });
          }
        }
-       else if ( type == 2 ) {
+       else if ( self.type == 2 ) {
          for (var i in GAME_LIST) {
              socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft});
          }
        }
      }
     //handle displaying end game  GAME_OVER_STRING
-    if (timePhase == 4) {
-       if (type == 0 ){
+    if (self.timePhase == 3) {
+       if (self.type == 0 ){
          for (var i in MOVIE_LIST) {
            socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft } );
          }
        }
-       else if ( type == 1 ) {
+       else if ( self.type == 1 ) {
          for (var i in GAME_LIST) {
              socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft  });
          }
        }
-       else if ( type == 2 ) {
+       else if ( self.type == 2 ) {
          for (var i in GAME_LIST) {
              socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft});
          }
@@ -115,7 +127,7 @@ var Game = function(typeNum){
      }
   }
 
-  var passTime = function(timePassed){
+  self.passTime = function(timePassed){
     self.timeLeft -= timePassed;
     if ( self.timeLeft <= 0 ) {
       self.timeLeft = 1000;
@@ -123,31 +135,94 @@ var Game = function(typeNum){
     }
   }
 
-  var handleSecond(){
+  self.handleSecond = function(){
     if (self.timeDisplayLeft>0){
       self.timeDisplayLeft--;
+      if (self.timeDisplayLeft == 8) {
+        self.updatePrompt(1);
+      }
       if (self.timeDisplayLeft == 0) {
-        
+        if ( timePhase == 0 ) {
+          self.timePhase +=1;
+          self.round++;
+          self.updatePrompt(0);
+          self.timeDisplayLeft = GUESSING_TIME;
+        }
+        else if ( self.timePhase == 1 ) {
+          self.timePhase +=1;
+          self.timeDisplayLeft = RESULTS_TIME;
+        }
+        else if ( self.timePhase == 2) {
+          //handle next round
+          if ( self.round != 10 ) {
+            self.timePhase == 1;
+            self.timeDisplayLeft = GUESSING_TIME;
+          }
+          //handle end game
+          else {
+
+          }
+        }
       }
     }
 
   }
-  var displayLeaderBoard = function(){
-    //display the leaderboard
+  //display top 3 players
+  self.displayLeaderBoard = function(){
+    if ( self.type == 0 ){
+      for (var i in MOVIE_LIST) {
+        if  (self.firstPlace != undefined) {
+          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
+        }
+        if  (self.secondPlace != undefined) {
+          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
+        }
+        if  (self.thirdPlace != undefined) {
+          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+        }
+      }
+    }
+    else if ( self.type == 1 ) {
+      for (var i in GAME_LIST) {
+        if  (self.firstPlace != undefined) {
+          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
+        }
+        if  (self.secondPlace != undefined) {
+          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
+        }
+        if  (self.thirdPlace != undefined) {
+          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+        }
+      }
+    }
+    else if ( self.type == 2 ) {
+      for (var i in GAME_LIST) {
+        if  (self.firstPlace != undefined) {
+          socket.emit(firstPlaceDisplay, { name: self.firstPlace.name, points: self.firstPlace.points });
+        }
+        if  (self.secondPlace != undefined) {
+          socket.emit(secondPlaceDisplay, { name: self.secondPlace.name, points: self.secondPlace.points });
+        }
+        if  (self.thirdPlace != undefined) {
+          socket.emit(thirdPlaceDisplay, { name: self.thirdPlace.name, points: self.thirdPlace.points });
+        }
+      }
+    }
   }
-  var displayPlayerStats = function(socket){
-    //display the players stats
+
+  self.updateLeaderBoard = function() {
+
   }
-  var updateRound = function() {
+  self.updateRound = function() {
     //call update answer depending on game type
   }
-  var updateAnswer = function(quote,word) {
+  self.updateAnswer = function(quote,word) {
 
   }
-  var endGame = function(socket) {
+  self.endGame = function(socket) {
 
   }
-  var handleSubmission = function(player, answer) {
+  self.handleSubmission = function(player, answer) {
 
   }
   return self;
@@ -176,8 +251,12 @@ var Player = function(id, playerName){
     self.name = playerName;
     self.points = 0;
     self.room = 0;
+    self.rank = 0;
     self.addPoints = function(points){
       self.updatePoints(points);
+    }
+    self.displayStats = function(){
+      socket.emit(playerInfo, { name: self.name, points: self.points, rank: self.rank });
     }
     Player.list[id] = self;
     return self;
