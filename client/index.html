@@ -1,34 +1,109 @@
-<div id="gameWrapper">
-  <div id="signDiv">
-    Username: <input id="signDiv-username" type="text"></input><br>
-    Password: <input id="signDiv-password" type="password"></input>
-    <button id="signDiv-signIn">Sign In</button>
-    <button id="signDiv-signUp">Sign Up</button>
-  </div>
+<!DOCTYPE html>
+<meta charset="ASCII">
+<title>Quoted</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Brent VanZant">
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- JQuery -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/game.css">
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+</head>
 
-  <div id="gameDiv" style="display:none;">
-    <div id="quoteArea">"I am a quote"</div>
-
-    <input id="submit-input" placeholder="guess" type="text" style="width:500px"></input>
-    <button id="submit-input-button">Submit</button>
-
-    <div id="roomDisplay"></div>
-    <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+<body>
+  <div id="gameWrapper">
+    <div class="row">
+      <div class="col">
+        <div>
+          <p id="title">Quoted</p>
+        </div>
+        <!-- Sign In Handling -->
+        <div id="signDiv" class="hiddenArea">
+          <div class="row">
+            <div class="col">
+              <p class="labelArea">USERNAME</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <input id="signDiv-username" placeholder="username" type="text"></input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <p class="labelFor">PASSWORD</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <input id="signDiv-password" type="password"></input>
+            </div>
+          </div>
+          <div class="row">
+            <div id="introButtonWrapper" class="col">
+              <button id="signDiv-signIn">Sign In</button>
+              <button id="signDiv-signUp">Sign Up</button>
+            </div>
+            <div id="continueButtonWrapper" class="col hiddenArea">
+              <button id="signDiv-continue">Continue</button>
+            </div>
+          </div>
+        </div>
+        <!--Sign in DIv end -->
+        <div id="gameDiv" >
+          <div class="row">
+            <div class="col">
+              <div id="quoteArea">"I am a quote"</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div id="feedbackArea" class="neutralColor">"Enter the book it's from"</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+                <input id="submit-input" placeholder="guess" type="text" style="width:300px"></input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <button id="submit-input-button">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form id="chat-form">
-        <input id="chat-input" type="text" style="width:500px"></input>
-    </form>
-    <div id ="playerRank">-4. Brent 13 pts</div>
-    <button id="general-chat-button">General Chat</button>
-    <button id="movie-chat-button">Movie Chat</button>
-    <button id="game-chat-button">Game Chat</button>
-    <button id="book-chat-button">Book Chat</button>
-    <div id ="rank1Display">-1. Brandt 13 pts</div>
-    <div id ="rank2Display">-2. Boy 13 pts</div>
-    <div id ="rank3Display">-3. Butt 13 pts</div>
+    <div id="gameDiv" class="hiddenArea">
+      <div id="quoteArea">"I am a quote"</div>
+
+      <input id="submit-input" placeholder="guess" type="text" style="width:500px"></input>
+      <button id="submit-input-button">Submit</button>
+
+      <div id="roomDisplay"></div>
+      <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+      </div>
+
+      <form id="chat-form">
+          <input id="chat-input" type="text" style="width:500px"></input>
+      </form>
+      <div id ="playerRank">-4. Brent 13 pts</div>
+      <button id="general-chat-button">General Chat</button>
+      <button id="movie-chat-button">Movie Chat</button>
+      <button id="game-chat-button">Game Chat</button>
+      <button id="book-chat-button">Book Chat</button>
+      <div id ="rank1Display">-1. Brandt 13 pts</div>
+      <div id ="rank2Display">-2. Boy 13 pts</div>
+      <div id ="rank3Display">-3. Butt 13 pts</div>
+    </div>
   </div>
-</div>
+</body>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>

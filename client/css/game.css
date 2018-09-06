@@ -1,0 +1,85 @@
+body {
+  background-color: #white;
+  color: black;
+  font-family: 'Roboto';
+}
+
+#gameWrapper {
+  position: absolute;
+   top: 50%;
+   left: 50%;
+   -webkit-transform: translate(-50%, -50%);
+   transform: translate(-50%, -50%);
+   width: 400px;
+   height: 600px;
+   border-style: solid;
+   border-color: black;
+   border-width: 4px;
+  text-align: center;
+}
+#title {
+  padding-top: 6px;
+  font-family: 'Roboto';
+  font-size: 44px;
+}
+#quoteArea {
+  padding-bottom: 6px;
+  font-family: 'Roboto';
+  font-size: 22px;
+}
+input[type="text"]
+{
+    background: transparent;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    font-family: 'Roboto';
+    font-size: 16px;
+    color: black;
+}
+input[type="password"]
+{
+    background: transparent;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    color: black;
+    font-family: 'Roboto';
+    font-size: 16px;
+}
+button
+{
+  margin-top: 6px;
+  background: black;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top:4px;
+  padding-bottom:4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+.labelArea
+{
+  margin-bottom: 2px;
+  font-size: 22px;
+}
+.labelFor
+{
+  margin-top: 6px;
+  margin-bottom: 2px;
+  font-size: 22px;
+}
+.hiddenArea
+{
+  display: none;
+}
+.neutralColor{
+  color:gray;
+}
+.positiveColor{
+  color:green;
+}
+.negativeColor{
+  color:red;
+}
