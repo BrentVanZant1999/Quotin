@@ -42,6 +42,7 @@ var Game = function(typeNum){
       round:0,
 
       //timing handling
+      msLeft = 0,
       isWaitingForGame: true,
       internalTime:30,
       externalTime:10,
@@ -64,7 +65,7 @@ var Game = function(typeNum){
           }
         }
         if (self.type == 1){
-          for (var i in GAME_LIST) {
+          for (var i i   n GAME_LIST) {
             socket.emit(strin gToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
           }
         }
@@ -131,44 +132,34 @@ var Game = function(typeNum){
   }
 
   self.passTime = function(timePassed){
-    self.timeLeft -= timePassed;
-    if ( self.timeLeft <= 0 ) {
-      self.timeLeft = 1000;
+    self.msLeft -= timePassed;
+    if ( self.msLeft <= 0 ) {
+      self.msLeft = 1000;
       self.handleSecond();
     }
   }
 
   self.handleSecond = function(){
-    if (self.timeDisplayLeft>0){
-      self.timeDisplayLeft--;
-      if (self.timeDisplayLeft == 8) {
-        self.updatePrompt(1);
+    if ( self.isWaitingForGame ) {
+      self.externalTime--;
+      if ( self.externalTime <= 0 ){
+        self.isWaitingForGame = false;
       }
-      if (self.timeDisplayLeft == 0) {
-        if ( timePhase == 0 ) {
-          self.timePhase +=1;
-          self.round++;
-          self.updatePrompt(0);
-          self.timeDisplayLeft = GUESSING_TIME;
+    }
+    else {
+      self.internalTime--;
+      if ( self.internalTime <= 0) {
+        self.round++;
+        if ( self.round < 16 ) {
+          self.internalTime = 30;
         }
-        else if ( self.timePhase == 1 ) {
-          self.timePhase +=1;
-          self.timeDisplayLeft = RESULTS_TIME;
-        }
-        else if ( self.timePhase == 2) {
-          //handle next round
-          if ( self.round != 10 ) {
-            self.timePhase == 1;
-            self.timeDisplayLeft = GUESSING_TIME;
-          }
-          //handle end game
-          else {
-
-          }
+        else {
+          self.isWaitingForGame = true;
+          self.externalTime = 10;
+          self.round = 1; 
         }
       }
     }
-
   }
   //display top 3 players
   self.displayLeaderBoard = function(){
@@ -434,7 +425,7 @@ io.sockets.on('connection', function(socket){
 });
 
 setInterval(function(){
-  gameGame.passTime(1000/25);
-  bookGame.passTime(1000/25);
-  movieGame.passTime(1000/25);
-},1000/25);
+  gameGame.passTime(100);
+  bookGame.passTime(100);
+  movieGame.passTime(100);
+},100);
