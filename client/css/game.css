@@ -87,6 +87,9 @@ button
   margin-bottom:8px;
   margin-left:4px;
 }
+.subtitle{
+    font-size: 22px;
+}
 .invalidButton{
   background-color:#303F42;
 }

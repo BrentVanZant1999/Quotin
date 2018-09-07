@@ -20,7 +20,7 @@
     <div class="row">
       <div class="col">
         <div>
-          <p id="title">Quoted <span id="roomDisplay" class="subtitle hiddenArea"></span></p>
+          <p id="title">Quoted <span id="roomDisplay" class="subtitle neutralColor"></span></p>
         </div>
         <!-- Sign In Handling -->
         <div id="signDiv" class="visibleArea">
@@ -60,6 +60,8 @@
           </div>
         </div>
         <!--Sign in Div end -->
+
+
         <!-- Game Div  start -->
         <div id="gameDiv" class="hiddenArea" >
           <div class="row">
@@ -109,6 +111,8 @@
           </div>
         </div>
         <!-- Game Div end -->
+
+
         <!-- Room Select Div start -->
         <div id="selectDiv" class="hiddenArea">
           <div class="row">
@@ -129,6 +133,8 @@
             </div>
           </div>
         </div>
+
+
         <!-- room select div done -->
       </div>
     </div>
@@ -139,8 +145,11 @@
 <script>
     var socket = io();
 
-    //sign
+    //main game divs
     var signDiv = document.getElementById('signDiv');
+    var gameDiv = document.getElementById('gameDiv');
+    var selectDiv = document.getElementById('selectDiv');
+
     var signDivUsername = document.getElementById('signDiv-username');
     var signDivSignIn = document.getElementById('signDiv-signIn');
     var signDivSignUp = document.getElementById('signDiv-signUp');
@@ -183,8 +192,8 @@
         if(data.success){
             signDiv.classList.remove('visibleArea');
             signDiv.classList.add('hiddenArea');
-            selectDiv.classList.remove('hiddenArea');
-            selectDiv.classList.add('visibleArea');
+          selectDiv.classList.remove('hiddenArea');
+           selectDiv.classList.add('visibleArea');
         } else
           alertArea.classList.remove('hiddenArea');
           alertArea.classList.add('visibleArea');
@@ -216,7 +225,7 @@
     var chatInput = document.getElementById('chat-input');
     var chatForm = document.getElementById('chat-form');
     var roomDisplay = document.getElementById('roomDisplay');
-
+    var playerData = document.getElementById('playerData');
 
     //define room selection buttons
     var movieButton = document.getElementById('movie-chat-button');
@@ -239,9 +248,21 @@
         chatText.innerHTML += '<div>' + data + '</div>';
     });
 
+    //update the room being displayed to the user
     socket.on('changeRoom',function(data) {
-        chatText.innerHTML = "";
-        roomDisplay.innerHTML = data.roomName;
+      selectDiv.classList.remove('visibleArea');
+      selectDiv.classList.add('hiddenArea');
+      gameDiv.classList.remove('hiddenArea');
+      gameDiv.classList.add('visibleArea');
+      //handle text
+      chatText.innerHTML = "";
+      console.log(data.roomName);
+      roomDisplay.innerHTML = data.roomName;
+    });
+
+    //update the player data shown to the player
+    socket.on('updatePlayerData',function(data) {
+      playerData.innerHTML = data.completeString;
     });
 
     chatForm.onsubmit = function(e) {

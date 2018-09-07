@@ -26,19 +26,25 @@ var ROUND_OVER_STRING = "Round finished, new round starting in ";
 var Game = function(typeNum){
   //define self
   var self = {
+      //variable counts
       playerCount:0,
       type:typeNum,
+      //string handling
       currentString:"test quote",
       promptString:"",
       acceptedAnswer:"Alexander Hamilton",
-      isActive:false, //handles if is in guessing stage
+
+      //first place handling
       firstPlaceSocket:undefined,
       firstPlaceScore:0,
+
+      //round counter
       round:0,
-      timeDisplayLeft: 0,
-      timeLeft:0,
-      timePhase:0, // 0 game starting, 1 guesing, 2 results, 3 game results
-      isOver:false
+
+      //timing handling
+      isWaitingForGame: true,
+      internalTime:30,
+      externalTime:10,
   }
   //add a player to count
   self.addPlayer = function(){
@@ -51,7 +57,7 @@ var Game = function(typeNum){
   //through displayString
   self.displayString = function(){
     //handle displaying preround
-    if (self.timePhase == 0) {
+    if (self.isWaitingForGame == true) {
         if (self.type == 0){
           for (var i in MOVIE_LIST) {
             socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
@@ -59,7 +65,7 @@ var Game = function(typeNum){
         }
         if (self.type == 1){
           for (var i in GAME_LIST) {
-            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+            socket.emit(strin gToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
           }
         }
         if (self.type == 2){
@@ -319,22 +325,22 @@ var gotoRoom= function(socket,roomNumber){
   if (roomNumber == 0 ) {
     GENERAL_LIST[socket.id] = socket;
     Player.list[socket.id].room = 0;
-    socket.emit('changeRoom',{roomName:"General Chat"});
+    socket.emit('changeRoom',{roomName:"General"});
   }
   else if (roomNumber == 1 ) {
     MOVIE_LIST[socket.id] = socket;
     Player.list[socket.id].room = 1;
-    socket.emit('changeRoom',{roomName:"Movie Chat"});
+    socket.emit('changeRoom',{roomName:"Movies"});
   }
   else if (roomNumber == 2 ) {
     GAME_LIST[socket.id] = socket;
     Player.list[socket.id].room = 2;
-    socket.emit('changeRoom',{roomName:"Game Chat"});
+    socket.emit('changeRoom',{roomName:"Games"});
   }
   else if (roomNumber == 3 ) {
     BOOK_LIST[socket.id] = socket;
     Player.list[socket.id].room = 3;
-    socket.emit('changeRoom',{roomName:"Book Chat"});
+    socket.emit('changeRoom',{roomName:"Books"});
   }
 }
 
@@ -365,7 +371,6 @@ io.sockets.on('connection', function(socket){
         isValidPassword(data,function(res){
             if(res){
                 Player.onConnect(socket, data.username);
-                gotoRoom(socket, 0);
                 socket.emit('signInResponse',{success:true});
             } else {
                 socket.emit('signInResponse',{success:false});
@@ -385,7 +390,6 @@ io.sockets.on('connection', function(socket){
         });
     });
     socket.on('continue',function(data){
-      gotoRoom(socket, 0);
       socket.emit('signInResponse',{success:true});
     });
 
