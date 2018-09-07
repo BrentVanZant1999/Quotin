@@ -226,7 +226,8 @@
     var chatForm = document.getElementById('chat-form');
     var roomDisplay = document.getElementById('roomDisplay');
     var playerData = document.getElementById('playerData');
-
+    var quoteArea = document.getElementById('quoteArea')
+    var feedback = document.getElementById('feedbackArea');
     //define room selection buttons
     var movieButton = document.getElementById('movie-chat-button');
     var gameButton = document.getElementById('game-chat-button');
@@ -263,6 +264,10 @@
     //update the player data shown to the player
     socket.on('updatePlayerData',function(data) {
       playerData.innerHTML = data.completeString;
+    });
+
+    socket.on('stringToDisplay',function(data) {
+      quoteArea.innerHTML = data.display;
     });
 
     chatForm.onsubmit = function(e) {

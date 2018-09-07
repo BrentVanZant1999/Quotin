@@ -27,7 +27,8 @@ body {
 #quoteArea {
   padding-bottom: 6px;
   font-family: 'Roboto';
-  font-size: 22px;
+  font-size: 18px;
+  max-width: 300px;
 }
 #chat-text {
   text-align: left;
@@ -43,7 +44,7 @@ body {
 #alertArea
 {
   padding-top: 8px;
-    padding-bottom: 0px;
+  padding-bottom: 0px;
 }
 input[type="text"]
 {

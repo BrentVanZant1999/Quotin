@@ -42,7 +42,7 @@ var Game = function(typeNum){
       round:0,
 
       //timing handling
-      msLeft = 0,
+      msLeft: 1000,
       isWaitingForGame: true,
       internalTime:30,
       externalTime:10,
@@ -55,80 +55,65 @@ var Game = function(typeNum){
   self.removePlayer = function(){
     self.playerCount--;
   }
+
   //through displayString
   self.displayString = function(){
     //handle displaying preround
     if (self.isWaitingForGame == true) {
+        var toDisplay = GAME_STARTING_STRING + self.externalTime + " seconds.";
         if (self.type == 0){
           for (var i in MOVIE_LIST) {
-            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+            MOVIE_LIST[i].emit('stringToDisplay', { display : toDisplay } );
           }
         }
         if (self.type == 1){
-          for (var i i   n GAME_LIST) {
-            socket.emit(strin gToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+          for (var i in GAME_LIST) {
+            GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
           }
         }
         if (self.type == 2){
-          for (var i in GAME_LIST) {
-            socket.emit(stringToDisplay, { promptString:GAME_STARTING_STRING + self.timeDisplayLeft } );
+          for (var i in BOOK_LIST) {
+            BOOK_LIST[i].emit('stringToDisplay', { display : toDisplay } );
           }
         }
     }
-    //handle displaying quote string
-   if (self.timePhase == 1 ) {
-      if (self.type == 0 ){
-        for (var i in MOVIE_LIST) {
-          socket.emit(stringToDisplay, { promptString:self.promptString} );
+    else {
+      //handle displaying half quote
+      var toDisplay = "";
+      if ( self.internalTime > 20 ) {
+        toDisplay =  "\""+ self.currentString.substr(0, Math.floor(self.currentString.length/2)) + "...\"";
+      }
+      //handle displaying full quote
+      else if ( self.internalTime > 10 ) {
+        toDisplay = "\""+self.currentString+"\"";
+      }
+      //handle displaying results
+      else {
+        if ( self.round<15 ) {
+          toDisplay = ROUND_OVER_STRING + self.internalTime + " seconds.";
+        }
+        else {
+          toDisplay = GAME_OVER_STRING + self.internalTime + " seconds.";
         }
       }
-      else if ( self.type == 1 ) {
-        for (var i in GAME_LIST) {
-            socket.emit(stringToDisplay, { promptString:self.promptString});
+
+      //handle displaying strin
+      if (self.type == 0){
+        for (var i in MOVIE_LIST ) {
+          MOVIE_LIST[i].emit('stringToDisplay', { display : toDisplay } );
         }
       }
-      else if ( self.type == 2 ) {
-        for (var i in GAME_LIST) {
-            socket.emit(stringToDisplay, { promptString:self.promptString});
+      if (self.type == 1){
+        for (var i in GAME_LIST ) {
+          GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
+        }
+      }
+      if (self.type == 2){
+        for (var i in BOOK_LIST ) {
+          BOOK_LIST[i].emit('stringToDisplay', { display : toDisplay } );
         }
       }
     }
-    //hand displaying end round
-    if (self.timePhase == 2) {
-       if (self.type == 0 ){
-         for (var i in MOVIE_LIST) {
-           socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft } );
-         }
-       }
-       else if ( self.type == 1 ) {
-         for (var i in GAME_LIST) {
-             socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft  });
-         }
-       }
-       else if ( self.type == 2 ) {
-         for (var i in GAME_LIST) {
-             socket.emit(stringToDisplay, { promptString:ROUND_OVER_STRING + self.timeDisplayLeft});
-         }
-       }
-     }
-    //handle displaying end game  GAME_OVER_STRING
-    if (self.timePhase == 3) {
-       if (self.type == 0 ){
-         for (var i in MOVIE_LIST) {
-           socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft } );
-         }
-       }
-       else if ( self.type == 1 ) {
-         for (var i in GAME_LIST) {
-             socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft  });
-         }
-       }
-       else if ( self.type == 2 ) {
-         for (var i in GAME_LIST) {
-             socket.emit(stringToDisplay, { promptString:GAME_OVER_STRING + self.timeDisplayLeft});
-         }
-       }
-     }
   }
 
   self.passTime = function(timePassed){
@@ -137,6 +122,8 @@ var Game = function(typeNum){
       self.msLeft = 1000;
       self.handleSecond();
     }
+    self.displayLeaderBoard();
+    self.displayString();
   }
 
   self.handleSecond = function(){
@@ -156,29 +143,30 @@ var Game = function(typeNum){
         else {
           self.isWaitingForGame = true;
           self.externalTime = 10;
-          self.round = 1; 
+          self.round = 1;
         }
       }
     }
   }
   //display top 3 players
   self.displayLeaderBoard = function(){
+    self.updateLeaderBoard();
     if  (self.firstPlaceSocket != undefined) {
       var playerName = Player.list[self.firstPlaceSocket].name;
       var playerPoints = Player.list[self.firstPlaceSocket].points;
       if ( self.type == 0 ){
         for (var i in MOVIE_LIST) {
-          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
+          MOVIE_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
         }
       }
       else if ( self.type == 1 ) {
         for (var i in GAME_LIST) {
-          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
+          GAME_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
         }
       }
       else if ( self.type == 2) {
         for (var i in BOOK_LIST) {
-          socket.emit(firstPlaceDisplay, { name: playerName, points: playerPoints });
+        BOOK_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
         }
       }
     }
