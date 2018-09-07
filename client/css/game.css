@@ -40,6 +40,11 @@ body {
   padding-right: 12px;
   padding-left: 12px;
 }
+#alertArea
+{
+  padding-top: 8px;
+    padding-bottom: 0px;
+}
 input[type="text"]
 {
     background: transparent;
@@ -62,7 +67,7 @@ input[type="password"]
 }
 button
 {
-  margin-top: 6px;
+  margin-top: 0px;
   background: black;
   padding-left: 6px;
   padding-right: 6px;
@@ -71,6 +76,19 @@ button
   border: none;
   color: white;
   cursor: pointer;
+}
+.selectButton
+{
+  width:140px;
+  height:140px;
+  text-align:center;
+  font-size: 26px;
+  margin-top:10px;
+  margin-bottom:8px;
+  margin-left:4px;
+}
+.invalidButton{
+  background-color:#303F42;
 }
 .labelArea
 {
@@ -87,11 +105,15 @@ button
 {
   display: none;
 }
+.s
+{
+  display: block;
+}
 .neutralColor{
-  color:gray;
+  color:#303F42;
 }
 .positiveColor{
-  color:green;
+  color:#EEC015;
 }
 .negativeColor{
   color:red;

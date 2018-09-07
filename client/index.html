@@ -20,10 +20,10 @@
     <div class="row">
       <div class="col">
         <div>
-          <p id="title">Quoted</p>
+          <p id="title">Quoted <span id="roomDisplay" class="subtitle hiddenArea"></span></p>
         </div>
         <!-- Sign In Handling -->
-        <div id="signDiv" class="hiddenArea">
+        <div id="signDiv" class="visibleArea">
           <div class="row">
             <div class="col">
               <p class="labelArea">USERNAME</p>
@@ -45,7 +45,12 @@
             </div>
           </div>
           <div class="row">
-            <div id="introButtonWrapper" class="col">
+            <div class="col">
+              <p id="alertArea" class="hiddenArea"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div id="introButtonWrapper" class="col visibleArea">
               <button id="signDiv-signIn">Sign In</button>
               <button id="signDiv-signUp">Sign Up</button>
             </div>
@@ -105,51 +110,27 @@
         </div>
         <!-- Game Div end -->
         <!-- Room Select Div start -->
-        <div id="signDiv" >
+        <div id="selectDiv" class="hiddenArea">
           <div class="row">
             <div class="col">
-              <button id="movie-chat-button">Movie Chat</button>
+              <button id="movie-chat-button" class="selectButton">Movie Chat</button>
             </div>
             <div class="col">
-              <button id="game-chat-button">Game Chat</button>
+              <button id="game-chat-button" class="selectButton">Game Chat</button>
 
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <button id="book-chat-button">Book Chat</button>
+              <button id="book-chat-button" class="selectButton">Book Chat</button>
             </div>
             <div class="col">
-              <button id="general-chat-button">Book Chat</button>
+              <button class="selectButton invalidButton">Coming Soon</button>
             </div>
-          </div>
           </div>
         </div>
         <!-- room select div done -->
       </div>
-    </div>
-
-    <div id="gameDiv" class="hiddenArea">
-      <div id="quoteArea">"I am a quote"</div>
-
-      <input id="submit-input" placeholder="guess" type="text" style="width:500px"></input>
-      <button id="submit-input-button">Submit</button>
-
-
-      <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-      </div>
-
-      <form id="chat-form">
-          <input id="chat-input" type="text" style="width:500px"></input>
-      </form>
-      <div id ="playerRank">-4. Brent 13 pts</div>
-      <button id="general-chat-button">General Chat</button>
-      <button id="movie-chat-button">Movie Chat</button>
-      <button id="game-chat-button">Game Chat</button>
-      <button id="book-chat-button">Book Chat</button>
-      <div id ="rank1Display">-1. Brandt 13 pts</div>
-      <div id ="rank2Display">-2. Boy 13 pts</div>
-      <div id ="rank3Display">-3. Butt 13 pts</div>
     </div>
   </div>
 </body>
@@ -164,69 +145,106 @@
     var signDivSignIn = document.getElementById('signDiv-signIn');
     var signDivSignUp = document.getElementById('signDiv-signUp');
     var signDivPassword = document.getElementById('signDiv-password');
+    var signDivInputs = document.getElementById('introButtonWrapper');
+    var signDivContinue = document.getElementById('continueButtonWrapper');
+    var alertArea = document.getElementById('alertArea');
+
+    //handle continue button being clicked - take user to next room
+    signDivContinue.onclick =  function(){
+      socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
+    }
 
     signDivSignIn.onclick = function(){
-        socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
+        if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
+          socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
+        }
+        else {
+          alertArea.classList.remove('hiddenArea');
+          alertArea.classList.add('visibleArea');
+          alertArea.classList.add('neutralColor');
+          alertArea.innerHTML = "Fields Missing";
+        }
     }
 
     signDivSignUp.onclick = function(){
-        socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
+        if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
+          socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
+        }
+        else {
+          alertArea.classList.remove('hiddenArea');
+          alertArea.classList.add('visibleArea');
+          alertArea.classList.add('neutralColor');
+          alertArea.innerHTML = "Fields Missing";
+        }
+
     }
 
     socket.on('signInResponse',function(data){
         if(data.success){
-            signDiv.style.display = 'none';
-            gameDiv.style.display = 'inline-block';
+            signDiv.classList.remove('visibleArea');
+            signDiv.classList.add('hiddenArea');
+            selectDiv.classList.remove('hiddenArea');
+            selectDiv.classList.add('visibleArea');
         } else
-            alert("Sign in unsuccessul.");
+          alertArea.classList.remove('hiddenArea');
+          alertArea.classList.add('visibleArea');
+          alertArea.classList.add('neutralColor');
+          alertArea.innerHTML = "Login Incorrect";
     });
 
     socket.on('signUpResponse',function(data){
         if(data.success){
-            alert("Sign up successul.");
-        } else
-            alert("Sign up unsuccessul.");
+          alertArea.classList.remove('hiddenArea');
+          alertArea.classList.add('visibleArea');
+          alertArea.classList.remove('neutralColor');
+          alertArea.classList.add('positiveColor');
+          alertArea.innerHTML = "Sign Up Complete";
+          signDivInputs.classList.remove('visibleArea');
+          signDivInputs.classList.add('hiddenArea');
+          signDivContinue.classList.remove('hiddenArea');
+          signDivContinue.classList.add('visibleArea');
+        }
+        else {
+          alertArea.classList.remove('hiddenArea');
+          alertArea.classList.add('visibleArea');
+          alertArea.innerHTML = "Username already taken";
+        }
     });
 
-    //game
+    // define game attributes
     var chatText = document.getElementById('chat-text');
     var chatInput = document.getElementById('chat-input');
     var chatForm = document.getElementById('chat-form');
     var roomDisplay = document.getElementById('roomDisplay');
-    var generalButton = document.getElementById('general-chat-button');
+
+
+    //define room selection buttons
     var movieButton = document.getElementById('movie-chat-button');
     var gameButton = document.getElementById('game-chat-button');
     var bookButton = document.getElementById('book-chat-button');
 
-    generalButton.onclick = function(){
-        socket.emit('roomButton',{roomNumber:0});
-    }
-    movieButton.onclick = function(){
+    movieButton.onclick = function() {
         socket.emit('roomButton',{roomNumber:1});
     }
 
-    gameButton.onclick = function(){
+    gameButton.onclick = function() {
         socket.emit('roomButton',{roomNumber:2});
     }
 
-    bookButton.onclick = function(){
+    bookButton.onclick = function() {
         socket.emit('roomButton',{roomNumber:3});
     }
 
-
-    var ctx = document.getElementById("ctx").getContext("2d");
-    ctx.font = '30px Arial';
-
-    socket.on('addToChat',function(data){
+    socket.on('addToChat',function(data) {
         chatText.innerHTML += '<div>' + data + '</div>';
     });
 
-    socket.on('changeRoom',function(data){
+    socket.on('changeRoom',function(data) {
         chatText.innerHTML = "";
         roomDisplay.innerHTML = data.roomName;
     });
 
-    chatForm.onsubmit = function(e){
+    chatForm.onsubmit = function(e) {
         e.preventDefault();
         if(chatInput.value[0] === '/')
             socket.emit('evalServer',chatInput.value.slice(1));

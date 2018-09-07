@@ -6,8 +6,8 @@ app.use(express.static(__dirname + '/client'));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
-app.listen(PORT);
-
+ serv.listen(2000);
+console.log("Server Started");
 var SOCKET_LIST = {};
 var GENERAL_LIST = {};
 var GAME_LIST = {};
@@ -357,6 +357,8 @@ var addUser = function(data,cb){
 
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
+  console.log("connection");
+
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
     socket.on('signIn',function(data){
@@ -379,10 +381,12 @@ io.sockets.on('connection', function(socket){
                     socket.emit('signUpResponse',{success:true});
                 });
                 Player.onConnect(socket, data.username);
-                gotoRoom(socket, 0);
-                socket.emit('signInResponse',{success:true});
             }
         });
+    });
+    socket.on('continue',function(data){
+      gotoRoom(socket, 0);
+      socket.emit('signInResponse',{success:true});
     });
 
     socket.on('disconnect',function(){
