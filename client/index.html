@@ -249,6 +249,11 @@
         chatText.innerHTML += '<div>' + data + '</div>';
     });
 
+    socket.on('answerFeedback',function(data) {
+        feedback.innerHTML += data;
+    });
+
+
     //update the room being displayed to the user
     socket.on('changeRoom',function(data) {
       selectDiv.classList.remove('visibleArea');
@@ -262,8 +267,8 @@
     });
 
     //update the player data shown to the player
-    socket.on('updatePlayerData',function(data) {
-      playerData.innerHTML = data.completeString;
+    socket.on('playerInfo',function(data) {
+      playerData.innerHTML = data.displayValue;
     });
 
     socket.on('stringToDisplay',function(data) {

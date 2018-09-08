@@ -124,6 +124,7 @@ var Game = function(typeNum){
     }
     self.displayLeaderBoard();
     self.displayString();
+    self.displayStats();
   }
 
   self.handleSecond = function(){
@@ -222,6 +223,15 @@ var Game = function(typeNum){
       self.currentString = 0; //and a quote array
     }
   }
+
+  //update player stats
+  self.displayStats = function(){
+    var displayString = self.rank + "- " + self.name +"- " + self.points;
+    for (var i in Player.list) {
+      Player.list[i].emit('playerInfo', { displayValue : displayString } );
+      console.log(displayString);
+    }
+  }
   self.endGame = function(socket) {
 
   }
@@ -257,9 +267,6 @@ var Player = function(id, playerName){
     self.rank = 0;
     self.addPoints = function(points){
       self.updatePoints(points);
-    }
-    self.displayStats = function(){
-      socket.emit(playerInfo, { name: self.name, points: self.points, rank: self.rank });
     }
     Player.list[id] = self;
     return self;
