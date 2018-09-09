@@ -238,6 +238,7 @@
     inputButton.onclick = function() {
       var inputVal = inputAnswer.value;
       socket.emit('answerSubmit', { answer : inputVal });
+      inputAnswer.value = "";
     }
 
     movieButton.onclick = function() {
@@ -280,6 +281,20 @@
 
     socket.on('stringToDisplay',function(data) {
       quoteArea.innerHTML = data.display;
+    });
+
+    socket.on('feedBack',function(data) {
+      console.log("Feedback");
+      var boolDisplay = data.displayBool;
+      if ( boolDisplay == true ) {
+        feedback.classList.remove('hiddenArea');
+        feedback.classList.add('visibleArea');
+      }
+      else {
+        feedback.classList.remove('visibleArea');
+        feedback.classList.add('hiddenArea');
+      }
+      feedback.innerHTML = data.displayValue;
     });
 
     chatForm.onsubmit = function(e) {

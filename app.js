@@ -148,7 +148,7 @@ var Game = function(typeNum){
       }
     }
   }
-  //display top 3 players
+  //display top players
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
     if  (self.firstPlaceSocket != undefined) {
@@ -175,6 +175,7 @@ var Game = function(typeNum){
   self.updateLeaderBoard = function() {
     var highSocket = undefined;
     var highScore = 0;
+
     if ( self.type == 0 ){
       for (var i in MOVIE_LIST) {
         var playerNext = Player.list[i];
@@ -185,6 +186,7 @@ var Game = function(typeNum){
         }
       }
     }
+
     else if ( self.type == 1 ) {
       for (var i in GAME_LIST) {
         var playerNext = Player.list[i];
@@ -195,8 +197,10 @@ var Game = function(typeNum){
         }
       }
     }
+
     else if ( self.type == 2 ) {
       for (var i in GAME_LIST) {
+        console.log("in here");
         var playerNext = Player.list[i];
         var scoreNext = playerNext.points;
         if  (scoreNext > highScore) {
@@ -210,16 +214,16 @@ var Game = function(typeNum){
   }
 
   self.handleAnswer = function(answer) {
-    if (answer == self.acceptedAnswer) {
-      if (internalTime > 10) {
-        return internalTime-10;
+    if (self.internalTime > 10) {
+      if (answer == self.acceptedAnswer) {
+        return self.internalTime-10;
       }
       else {
         return 0;
       }
     }
     else {
-      return 0;
+      return -1;
     }
   }
 
@@ -265,43 +269,59 @@ var Player = function(id, playerName){
     self.room = 0;
     self.rank = 0;
     //adds points to player object.
-    self.addPoints = function(points){
-      self.updatePoints(points);
+    self.addPoints = function( points ){
+      self.updatePoints( points );
     }
     //gets player stats and emits them to player
-    self.getStats = function(socket){
+    self.getStats = function( socket ){
       var displayString = self.rank + "- " + self.name +"- " + self.points;
       socket.emit('playerInfo', { displayValue : displayString } );
     }
     //
-    self.handleSubmission = function(answer){
+    self.handleSubmission = function( answer, socket ){
         var answerFiltered = answer.toLowerCase();
         var displayString = "";
-        if (player.room == 1){
+        var displayBoolVal = true;
+        if (self.room == 1){
           if ( gameGame.handleAnswer(answerFiltered) > 0 ) {
             displayString = "Right Answer!";
+            displayBoolVal = true;
+          }
+          else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
+            displayString = "Wrong Answer!";
+            displayBoolVal = true;
           }
           else {
-            displayString = "Wrong Answer!";
+            displayBoolVal = false;
           }
         }
-        else if (player.room == 2){
+        else if (self.room == 2){
           if ( movieGame.handleAnswer(answerFiltered) > 0 ) {
             displayString = "Right Answer!";
+            displayBoolVal = true;
+          }
+          else if ( movieGame.handleAnswer(answerFiltered) == 0 ) {
+            displayString = "Wrong Answer!";
+            displayBoolVal = true;
           }
           else {
-            displayString = "Wrong Answer!";
+            displayBoolVal = false;
           }
         }
-        else if (player.room == 3){
+        else if (self.room == 3){
           if ( bookGame.handleAnswer(answerFiltered) > 0 ) {
             displayString = "Right Answer!";
+            displayBoolVal = true;
+          }
+          else if ( bookGame.handleAnswer(answerFiltered) == 0 ) {
+            displayString = "Wrong Answer!";
+            displayBoolVal = true;
           }
           else {
-            displayString = "Wrong Answer!";
+            displayBoolVal = false;
           }
-        socket.emit('feedBack', { displayValue : displayString, displayBool : true } );
-      }
+        }
+        socket.emit('feedBack', { displayValue : displayString, displayBool : displayBoolVal } );
     }
     Player.list[id] = self;
     return self;
@@ -322,7 +342,7 @@ Player.onConnect = function(socket, playerName){
     //call to submit a player answe
     socket.on('answerSubmit',function(data){
       var answer = data.answer;
-      player.handleSubmission(answer);
+      player.handleSubmission( answer, socket );
     });
 }
 Player.onDisconnect = function(socket){
