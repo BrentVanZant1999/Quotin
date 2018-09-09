@@ -124,7 +124,6 @@ var Game = function(typeNum){
     }
     self.displayLeaderBoard();
     self.displayString();
-    self.displayStats();
   }
 
   self.handleSecond = function(){
@@ -223,21 +222,6 @@ var Game = function(typeNum){
       self.currentString = 0; //and a quote array
     }
   }
-
-  //update player stats
-  self.displayStats = function(){
-    var displayString = self.rank + "- " + self.name +"- " + self.points;
-    for (var i in Player.list) {
-      Player.list[i].emit('playerInfo', { displayValue : displayString } );
-      console.log(displayString);
-    }
-  }
-  self.endGame = function(socket) {
-
-  }
-  self.handleSubmission = function(player, answer) {
-
-  }
   return self;
 }
 
@@ -265,8 +249,14 @@ var Player = function(id, playerName){
     self.points = 0;
     self.room = 0;
     self.rank = 0;
+    //adds points to player object.
     self.addPoints = function(points){
       self.updatePoints(points);
+    }
+    //gets player stats and emits them to player
+    self.getStats = function(socket){
+      var displayString = self.rank + "- " + self.name +"- " + self.points;
+      socket.emit('playerInfo', { displayValue : displayString } );
     }
     Player.list[id] = self;
     return self;
@@ -276,9 +266,15 @@ Player.list = {};
 
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
+    //call to handle room movement
     socket.on('roomButton',function(data){
       gotoRoom(socket,data.roomNumber);
     });
+    //call to get  the players stats
+    socket.on('getStats',function(data){
+      player.getStats(socket);
+    });
+    //call to submit a player answe
     socket.on('answerSubmit',function(data){
       var answer = data.answer;
       if (player.room == 1){
