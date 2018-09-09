@@ -154,19 +154,20 @@ var Game = function(typeNum){
     if  (self.firstPlaceSocket != undefined) {
       var playerName = Player.list[self.firstPlaceSocket].name;
       var playerPoints = Player.list[self.firstPlaceSocket].points;
+      var dataString = playerName + " is in FIRST with " + playerPoints +" points.";
       if ( self.type == 0 ){
         for (var i in MOVIE_LIST) {
-          MOVIE_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
+          MOVIE_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
         }
       }
       else if ( self.type == 1 ) {
         for (var i in GAME_LIST) {
-          GAME_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
+          GAME_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
         }
       }
       else if ( self.type == 2) {
         for (var i in BOOK_LIST) {
-        BOOK_LIST[i].emit('firstPlaceDisplay', { name: playerName, points: playerPoints });
+          BOOK_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
         }
       }
     }

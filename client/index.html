@@ -93,7 +93,7 @@
             <div class="col">
               <div id="chat-text" style="width:300px;height:200px;overflow:hidden">
                 <span>hello</span>
-              </div>
+              </div
               <form id="chat-form">
                   <input id="chat-input" type="text" style="width:300px"></input>
               </form>
@@ -101,7 +101,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <div>1- <span id="topName"></span> -<span id="topPoints"></span> points</div>
+              <div id="topData"></div>
             </div>
           </div>
           <div class="row">
@@ -143,169 +143,177 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 <script>
-    var socket = io();
-    var isPlaying = false;
-    //main game divs
-    var signDiv = document.getElementById('signDiv');
-    var gameDiv = document.getElementById('gameDiv');
-    var selectDiv = document.getElementById('selectDiv');
+  var socket = io();
+  var isPlaying = false;
+  //main game divs
+  var signDiv = document.getElementById('signDiv');
+  var gameDiv = document.getElementById('gameDiv');
+  var selectDiv = document.getElementById('selectDiv');
 
-    var signDivUsername = document.getElementById('signDiv-username');
-    var signDivSignIn = document.getElementById('signDiv-signIn');
-    var signDivSignUp = document.getElementById('signDiv-signUp');
-    var signDivPassword = document.getElementById('signDiv-password');
-    var signDivInputs = document.getElementById('introButtonWrapper');
-    var signDivContinue = document.getElementById('continueButtonWrapper');
-    var alertArea = document.getElementById('alertArea');
+  var signDivUsername = document.getElementById('signDiv-username');
+  var signDivSignIn = document.getElementById('signDiv-signIn');
+  var signDivSignUp = document.getElementById('signDiv-signUp');
+  var signDivPassword = document.getElementById('signDiv-password');
+  var signDivInputs = document.getElementById('introButtonWrapper');
+  var signDivContinue = document.getElementById('continueButtonWrapper');
+  var alertArea = document.getElementById('alertArea');
 
-    //handle continue button being clicked - take user to next room
-    signDivContinue.onclick =  function(){
-      socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
+  //handle continue button being clicked - take user to next room
+  signDivContinue.onclick =  function(){
+    socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
+  }
+
+  signDivSignIn.onclick = function(){
+    if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
+      socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
     }
-
-    signDivSignIn.onclick = function(){
-        if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
-          socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
-        }
-        else {
-          alertArea.classList.remove('hiddenArea');
-          alertArea.classList.add('visibleArea');
-          alertArea.classList.add('neutralColor');
-          alertArea.innerHTML = "Fields Missing";
-        }
+    else {
+      alertArea.classList.remove('hiddenArea');
+      alertArea.classList.add('visibleArea');
+      alertArea.classList.add('neutralColor');
+      alertArea.innerHTML = "Fields Missing";
     }
+  }
 
-    signDivSignUp.onclick = function(){
-        if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
-          socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
-        }
-        else {
-          alertArea.classList.remove('hiddenArea');
-          alertArea.classList.add('visibleArea');
-          alertArea.classList.add('neutralColor');
-          alertArea.innerHTML = "Fields Missing";
-        }
-
+  signDivSignUp.onclick = function(){
+    if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
+      socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
     }
-
-    socket.on('signInResponse',function(data){
-        if(data.success){
-          signDiv.classList.remove('visibleArea');
-          signDiv.classList.add('hiddenArea');
-          selectDiv.classList.remove('hiddenArea');
-          selectDiv.classList.add('visibleArea');
-        } else
-          alertArea.classList.remove('hiddenArea');
-          alertArea.classList.add('visibleArea');
-          alertArea.classList.add('neutralColor');
-          alertArea.innerHTML = "Login Incorrect";
-    });
-
-    socket.on('signUpResponse',function(data){
-        if(data.success){
-          alertArea.classList.remove('hiddenArea');
-          alertArea.classList.add('visibleArea');
-          alertArea.classList.remove('neutralColor');
-          alertArea.classList.add('positiveColor');
-          alertArea.innerHTML = "Sign Up Complete";
-          signDivInputs.classList.remove('visibleArea');
-          signDivInputs.classList.add('hiddenArea');
-          signDivContinue.classList.remove('hiddenArea');
-          signDivContinue.classList.add('visibleArea');
-        }
-        else {
-          alertArea.classList.remove('hiddenArea');
-          alertArea.classList.add('visibleArea');
-          alertArea.innerHTML = "Username already taken";
-        }
-    });
-
-    // define game attributes
-    var chatText = document.getElementById('chat-text');
-    var chatInput = document.getElementById('chat-input');
-    var chatForm = document.getElementById('chat-form');
-    var roomDisplay = document.getElementById('roomDisplay');
-    var playerData = document.getElementById('playerData');
-    var quoteArea = document.getElementById('quoteArea')
-    var feedback = document.getElementById('feedbackArea');
-    var inputAnswer = document.getElementById('submit-input-answer');
-    var inputButton = document.getElementById('submit-input-button');
-    //define room selection buttons
-    var movieButton = document.getElementById('movie-chat-button');
-    var gameButton = document.getElementById('game-chat-button');
-    var bookButton = document.getElementById('book-chat-button');
-
-    inputButton.onclick = function() {
-      var inputVal = inputAnswer.value;
-      socket.emit('answerSubmit', { answer : inputVal });
-      inputAnswer.value = "";
+    else {
+      alertArea.classList.remove('hiddenArea');
+      alertArea.classList.add('visibleArea');
+      alertArea.classList.add('neutralColor');
+      alertArea.innerHTML = "Fields Missing";
     }
+  }
 
-    movieButton.onclick = function() {
-        socket.emit('roomButton', { roomNumber : 1 });
+  socket.on('signInResponse',function(data){
+    if(data.success){
+      signDiv.classList.remove('visibleArea');
+      signDiv.classList.add('hiddenArea');
+      selectDiv.classList.remove('hiddenArea');
+      selectDiv.classList.add('visibleArea');
+      isPlaying = true;
+    } else
+      alertArea.classList.remove('hiddenArea');
+      alertArea.classList.add('visibleArea');
+      alertArea.classList.add('neutralColor');
+      alertArea.innerHTML = "Login Incorrect";
+  });
+
+  socket.on('signUpResponse',function(data){
+    if(data.success){
+      alertArea.classList.remove('hiddenArea');
+      alertArea.classList.add('visibleArea');
+      alertArea.classList.remove('neutralColor');
+      alertArea.classList.add('positiveColor');
+      alertArea.innerHTML = "Sign Up Complete";
+      signDivInputs.classList.remove('visibleArea');
+      signDivInputs.classList.add('hiddenArea');
+      signDivContinue.classList.remove('hiddenArea');
+      signDivContinue.classList.add('visibleArea');
     }
-
-    gameButton.onclick = function() {
-        socket.emit('roomButton', { roomNumber : 2 });
+    else {
+      alertArea.classList.remove('hiddenArea');
+      alertArea.classList.add('visibleArea');
+      alertArea.innerHTML = "Username already taken";
     }
+  });
 
-    bookButton.onclick = function() {
-        socket.emit('roomButton', { roomNumber : 3 });
+  // define game attributes
+  var chatText = document.getElementById('chat-text');
+  var chatInput = document.getElementById('chat-input');
+  var chatForm = document.getElementById('chat-form');
+  var roomDisplay = document.getElementById('roomDisplay');
+  var playerData = document.getElementById('playerData');
+  var quoteArea = document.getElementById('quoteArea')
+  var feedback = document.getElementById('feedbackArea');
+  var firstPlaceScore = document.getElementById('topData');
+  var inputAnswer = document.getElementById('submit-input-answer');
+  var inputButton = document.getElementById('submit-input-button');
+  //define room selection buttons
+  var movieButton = document.getElementById('movie-chat-button');
+  var gameButton = document.getElementById('game-chat-button');
+  var bookButton = document.getElementById('book-chat-button');
+
+  inputButton.onclick = function() {
+    var inputVal = inputAnswer.value;
+    socket.emit('answerSubmit', { answer : inputVal });
+    inputAnswer.value = "";
+  }
+
+  movieButton.onclick = function() {
+    socket.emit('roomButton', { roomNumber : 1 });
+  }
+
+  gameButton.onclick = function() {
+    socket.emit('roomButton', { roomNumber : 2 });
+  }
+
+  bookButton.onclick = function() {
+    socket.emit('roomButton', { roomNumber : 3 });
+  }
+
+  socket.on('addToChat',function(data) {
+    chatText.innerHTML += '<div>' + data + '</div>';
+  });
+
+  socket.on('answerFeedback',function(data) {
+    feedback.innerHTML += data;
+  });
+
+  socket.on('firstPlaceDisplay',function(data)) {
+    firstPlaceScore.innerHTML = data.displayString;
+  });
+
+
+  //update the room being displayed to the user
+  socket.on('changeRoom',function(data) {
+    selectDiv.classList.remove('visibleArea');
+    selectDiv.classList.add('hiddenArea');
+    gameDiv.classList.remove('hiddenArea');
+    gameDiv.classList.add('visibleArea');
+    //handle text
+    chatText.innerHTML = "";
+    console.log(data.roomName);
+    roomDisplay.innerHTML = data.roomName;
+  });
+
+  //update the player data shown to the player
+  socket.on('playerInfo',function(data) {
+    playerData.innerHTML = data.displayValue;
+  });
+
+  socket.on('stringToDisplay',function(data) {
+    quoteArea.innerHTML = data.display;
+  });
+
+  socket.on('feedBack',function(data) {
+    var boolDisplay = data.displayBool;
+    if ( boolDisplay == true ) {
+      feedback.classList.remove('hiddenArea');
+      feedback.classList.add('visibleArea');
     }
-
-    socket.on('addToChat',function(data) {
-        chatText.innerHTML += '<div>' + data + '</div>';
-    });
-
-    socket.on('answerFeedback',function(data) {
-        feedback.innerHTML += data;
-    });
-
-
-    //update the room being displayed to the user
-    socket.on('changeRoom',function(data) {
-      selectDiv.classList.remove('visibleArea');
-      selectDiv.classList.add('hiddenArea');
-      gameDiv.classList.remove('hiddenArea');
-      gameDiv.classList.add('visibleArea');
-      //handle text
-      chatText.innerHTML = "";
-      console.log(data.roomName);
-      roomDisplay.innerHTML = data.roomName;
-    });
-
-    //update the player data shown to the player
-    socket.on('playerInfo',function(data) {
-      playerData.innerHTML = data.displayValue;
-    });
-
-    socket.on('stringToDisplay',function(data) {
-      quoteArea.innerHTML = data.display;
-    });
-
-    socket.on('feedBack',function(data) {
-      console.log("Feedback");
-      var boolDisplay = data.displayBool;
-      if ( boolDisplay == true ) {
-        feedback.classList.remove('hiddenArea');
-        feedback.classList.add('visibleArea');
-      }
-      else {
-        feedback.classList.remove('visibleArea');
-        feedback.classList.add('hiddenArea');
-      }
-      feedback.innerHTML = data.displayValue;
-    });
-
-    chatForm.onsubmit = function(e) {
-        e.preventDefault();
-        if(chatInput.value[0] === '/')
-            socket.emit('evalServer',chatInput.value.slice(1));
-        else
-            socket.emit('sendMsgToServer',chatInput.value);
-        chatInput.value = '';
+    else {
+      feedback.classList.remove('visibleArea');
+      feedback.classList.add('hiddenArea');
     }
-    setInterval(function(){
+    feedback.innerHTML = data.displayValue;
+  });
+
+  chatForm.onsubmit = function(e) {
+    e.preventDefault();
+    if(chatInput.value[0] === '/')
+      socket.emit('evalServer',chatInput.value.slice(1));
+    else
+      socket.emit('sendMsgToServer',chatInput.value);
+    chatInput.value = '';
+  }
+
+  //continually get the player stats
+  setInterval(function(){
+    if (isPlaying) {
       socket.emit('getStats');
-    },100);
+    }
+  },100);
 </script>
