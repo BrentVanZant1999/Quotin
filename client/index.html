@@ -76,7 +76,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <input id="submit-input" placeholder="guess" type="text" style="width:300px"></input>
+              <input id="submit-input-answer" placeholder="guess" type="text" style="width:300px"></input>
             </div>
           </div>
           <div class="row">
@@ -190,10 +190,10 @@
 
     socket.on('signInResponse',function(data){
         if(data.success){
-            signDiv.classList.remove('visibleArea');
-            signDiv.classList.add('hiddenArea');
+          signDiv.classList.remove('visibleArea');
+          signDiv.classList.add('hiddenArea');
           selectDiv.classList.remove('hiddenArea');
-           selectDiv.classList.add('visibleArea');
+          selectDiv.classList.add('visibleArea');
         } else
           alertArea.classList.remove('hiddenArea');
           alertArea.classList.add('visibleArea');
@@ -228,21 +228,28 @@
     var playerData = document.getElementById('playerData');
     var quoteArea = document.getElementById('quoteArea')
     var feedback = document.getElementById('feedbackArea');
+    var inputAnswer = document.getElementById('submit-input-answer');
+    var inputButton = document.getElementById('submit-input-button');
     //define room selection buttons
     var movieButton = document.getElementById('movie-chat-button');
     var gameButton = document.getElementById('game-chat-button');
     var bookButton = document.getElementById('book-chat-button');
 
+    inputButton.onclick = function() {
+      var inputVal = inputAnswer.value;
+      socket.emit('answerSubmit', { answer : inputVal });
+    }
+
     movieButton.onclick = function() {
-        socket.emit('roomButton',{roomNumber:1});
+        socket.emit('roomButton', { roomNumber : 1 });
     }
 
     gameButton.onclick = function() {
-        socket.emit('roomButton',{roomNumber:2});
+        socket.emit('roomButton', { roomNumber : 2 });
     }
 
     bookButton.onclick = function() {
-        socket.emit('roomButton',{roomNumber:3});
+        socket.emit('roomButton', { roomNumber : 3 });
     }
 
     socket.on('addToChat',function(data) {

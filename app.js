@@ -209,12 +209,27 @@ var Game = function(typeNum){
     self.firstPlaceSocket = highSocket;
   }
 
+  self.handleAnswer = function(answer) {
+    if (answer == self.acceptedAnswer) {
+      if (internalTime > 10) {
+        return internalTime-10;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+
   self.newRound = function() {
     //call update essentials depending on game type
     self.updateEssentials(self.type);
     self.updateLeaderBoard();
     self.displayLeaderBoard();
   }
+
   self.updateEssentials = function(type) {
     if (type == 0){
       var randomNum =0; //generate a random number from array length
@@ -258,6 +273,36 @@ var Player = function(id, playerName){
       var displayString = self.rank + "- " + self.name +"- " + self.points;
       socket.emit('playerInfo', { displayValue : displayString } );
     }
+    //
+    self.handleSubmission = function(answer){
+        var answerFiltered = answer.toLowerCase();
+        var displayString = "";
+        if (player.room == 1){
+          if ( gameGame.handleAnswer(answerFiltered) > 0 ) {
+            displayString = "Right Answer!";
+          }
+          else {
+            displayString = "Wrong Answer!";
+          }
+        }
+        else if (player.room == 2){
+          if ( movieGame.handleAnswer(answerFiltered) > 0 ) {
+            displayString = "Right Answer!";
+          }
+          else {
+            displayString = "Wrong Answer!";
+          }
+        }
+        else if (player.room == 3){
+          if ( bookGame.handleAnswer(answerFiltered) > 0 ) {
+            displayString = "Right Answer!";
+          }
+          else {
+            displayString = "Wrong Answer!";
+          }
+        socket.emit('feedBack', { displayValue : displayString, displayBool : true } );
+      }
+    }
     Player.list[id] = self;
     return self;
 }
@@ -277,15 +322,7 @@ Player.onConnect = function(socket, playerName){
     //call to submit a player answe
     socket.on('answerSubmit',function(data){
       var answer = data.answer;
-      if (player.room == 1){
-        movieGame.handleSubmission(player, answer)
-      }
-      else if (player.room == 2){
-        gameGame.handleSubmission(player,answer)
-      }
-      else if (player.room == 3){
-        bookGame.handleSubmission(player,answer)
-      }
+      player.handleSubmission(answer);
     });
 }
 Player.onDisconnect = function(socket){
