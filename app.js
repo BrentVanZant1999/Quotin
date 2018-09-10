@@ -14,6 +14,33 @@ var GAME_LIST = {};
 var BOOK_LIST = {};
 var MOVIE_LIST = {};
 
+var BOOK_QUOTE_LIST = [
+    "You don’t have to live forever, you just have to live.",
+    "I would always rather be happy than dignified.",
+    "For what you see and hear depends a good deal on where you are standing.",
+    "Of course, it is happening inside your head, Harry, but why on earth should that mean that it is not real?",
+];
+
+var BOOK_ANSWER_LIST = [
+    "tuck everlasting",
+    "jane eyre",
+    "The Magician’s Nephew",
+    "Harry Potter and the Deathly Hallows",
+];
+var GAME_QUOTE_LIST = [
+    "We all make choices in life, but in the end our choices make us.",
+    "What is better? To be born good or to overcome your evil nature through great effort?",
+    "Bring me a bucket, and I'll show you a bucket!",
+    "A hero need not speak. When he is gone, the world will speak for him.",
+];
+
+var GAME_ANSWER_LIST = [
+    "Bioshock",
+    "Skyrim",
+    "Borderlands 2",
+    "Harry Potter and the Deathly Hallows",
+];
+
 var GUESSING_TIME = 15;
 var DISPLAY_TIME = 5;
 var RESULTS_TIME = 5;
@@ -417,6 +444,8 @@ io.sockets.on('connection', function(socket){
             }
         });
     });
+
+    //sign up
     socket.on('signUp',function(data){
         isUsernameTaken(data,function(res){
             if(res){
@@ -429,6 +458,7 @@ io.sockets.on('connection', function(socket){
             }
         });
     });
+    //continue
     socket.on('continue',function(data){
       socket.emit('signInResponse',{success:true});
     });
