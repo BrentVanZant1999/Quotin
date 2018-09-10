@@ -1,19 +1,28 @@
+/*
+ * These lines set up express and create a server to run the application on
+ * They also handle user calls to files.
+ */
 var express = require("express");
 var app =  express();
 var serv = require('http').Server(app);
-const PORT = 2000; //process.env.PORT || 8000;
+const PORT = process.env.PORT || 2000;
 app.use(express.static(__dirname + '/client'));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
- serv.listen(2000);
+ serv.listen(PORT);
+
+ //used to show successful start
 console.log("Server Started");
+
+//lists to keep track of sockets
 var SOCKET_LIST = {};
 var GENERAL_LIST = {};
 var GAME_LIST = {};
 var BOOK_LIST = {};
 var MOVIE_LIST = {};
 
+//quote and answer storage lists
 var BOOK_QUOTE_LIST = [
     "You don’t have to live forever, you just have to live.",
     "I would always rather be happy than dignified.",
@@ -25,21 +34,37 @@ var BOOK_ANSWER_LIST = [
     "tuck everlasting",
     "jane eyre",
     "The Magician’s Nephew",
-    "Harry Potter and the Deathly Hallows",
+    "Harry Potter and the Deathly Hallows"
 ];
 var GAME_QUOTE_LIST = [
     "We all make choices in life, but in the end our choices make us.",
     "What is better? To be born good or to overcome your evil nature through great effort?",
     "Bring me a bucket, and I'll show you a bucket!",
-    "A hero need not speak. When he is gone, the world will speak for him.",
+    "A hero need not speak. When he is gone, the world will speak for him."
 ];
 
 var GAME_ANSWER_LIST = [
     "Bioshock",
     "Skyrim",
     "Borderlands 2",
-    "Harry Potter and the Deathly Hallows",
+    "Halo"
 ];
+var MOVIE_QUOTE_LIST = [
+    "I'm going to make him an offer he can't refuse.",
+    "You're gonna need a bigger boat.",
+    "Carpe diem. Seize the day, boys. Make your lives extraordinary.",
+    "Here's Johnny!",
+    "Let's put a smile on that face!"
+];
+
+var MOVIE_ANSWER_LIST = [
+    "The Godfather",
+    "Jaws",
+    "Dead Poets Society",
+    "The Shining",
+    "The Dark Knight"
+];
+
 
 var GUESSING_TIME = 15;
 var DISPLAY_TIME = 5;
@@ -81,6 +106,28 @@ var Game = function(typeNum){
   //remove a player from count
   self.removePlayer = function(){
     self.playerCount--;
+  }
+
+  self.getNewQuote = function(){
+    //movie type
+    var randomNumber =
+    if (self.type == 0) {
+      var randomQuoteNum = Math.floor( Math.random() * MOVIE_QUOTE_LIST.length );
+      self.currentString  = MOVIE_QUOTE_LIST[randomQuoteNum];
+      self.acceptedAnswer  = MOVIE_ANSWER_LIST[randomQuoteNum];
+    }
+    //game type
+    else if (self.type == 1) {
+      var randomQuoteNum = Math.floor( Math.random() * GAME_QUOTE_LIST.length );
+      self.currentString  = GAME_QUOTE_LIST[randomQuoteNum];
+      self.acceptedAnswer  = GAME_ANSWER_LIST[randomQuoteNum];
+    }
+    //book type
+    else if (self.type == 2) {
+      var randomQuoteNum = Math.floor( Math.random() * BOOK_QUOTE_LIST.length );
+      self.currentString  = BOOK_QUOTE_LIST[randomQuoteNum];
+      self.acceptedAnswer  = BOOK_ANSWER_LIST[randomQuoteNum];
+    }
   }
 
   //through displayString
@@ -158,6 +205,7 @@ var Game = function(typeNum){
       self.externalTime--;
       if ( self.externalTime <= 0 ){
         self.isWaitingForGame = false;
+        self.getNewQuote();
       }
     }
     else {
@@ -166,6 +214,7 @@ var Game = function(typeNum){
         self.round++;
         if ( self.round < 16 ) {
           self.internalTime = 30;
+          self.getNewQuote();
         }
         else {
           self.isWaitingForGame = true;
@@ -503,6 +552,7 @@ io.sockets.on('connection', function(socket){
     });
 });
 
+//set a .1 second interval to pass time in each game object
 setInterval(function(){
   gameGame.passTime(100);
   bookGame.passTime(100);
