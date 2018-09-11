@@ -110,23 +110,25 @@ var Game = function(typeNum){
 
   self.getNewQuote = function(){
     //movie type
-    var randomNumber =
     if (self.type == 0) {
       var randomQuoteNum = Math.floor( Math.random() * MOVIE_QUOTE_LIST.length );
       self.currentString  = MOVIE_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = MOVIE_ANSWER_LIST[randomQuoteNum];
+      self.acceptedAnswer  = MOVIE_ANSWER_LIST[randomQuoteNum].toLowerCase();
+      console.log("Accepted Movie:" + self.acceptedAnswer);
     }
     //game type
     else if (self.type == 1) {
       var randomQuoteNum = Math.floor( Math.random() * GAME_QUOTE_LIST.length );
       self.currentString  = GAME_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = GAME_ANSWER_LIST[randomQuoteNum];
+      self.acceptedAnswer  = GAME_ANSWER_LIST[randomQuoteNum].toLowerCase();
+        console.log("Accepted Movie:" + self.acceptedAnswer);
     }
     //book type
     else if (self.type == 2) {
       var randomQuoteNum = Math.floor( Math.random() * BOOK_QUOTE_LIST.length );
       self.currentString  = BOOK_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = BOOK_ANSWER_LIST[randomQuoteNum];
+      self.acceptedAnswer  = BOOK_ANSWER_LIST[randomQuoteNum].toLowerCase();
+        console.log("Accepted Movie:" + self.acceptedAnswer);
     }
   }
 
@@ -257,9 +259,11 @@ var Game = function(typeNum){
       for (var i in MOVIE_LIST) {
         var playerNext = Player.list[i];
         var scoreNext = playerNext.points;
-        if  (scoreNext > highScore) {
-          highScore = scoreNext;
-          highSocket = i;
+        if (playerNext != undefined) {
+          if  (scoreNext > highScore) {
+            highScore = scoreNext;
+            highSocket = i;
+          }
         }
       }
     }
@@ -267,10 +271,12 @@ var Game = function(typeNum){
     else if ( self.type == 1 ) {
       for (var i in GAME_LIST) {
         var playerNext = Player.list[i];
-        var scoreNext = playerNext.points;
-        if  (scoreNext > highScore) {
-          highScore = scoreNext;
-          highSocket = i;
+        if (playerNext != undefined) {
+          var scoreNext = playerNext.points;
+          if  (scoreNext > highScore) {
+            highScore = scoreNext;
+            highSocket = i;
+          }
         }
       }
     }
@@ -279,10 +285,12 @@ var Game = function(typeNum){
       for (var i in GAME_LIST) {
         console.log("in here");
         var playerNext = Player.list[i];
-        var scoreNext = playerNext.points;
-        if  (scoreNext > highScore) {
-          highScore = scoreNext;
-          highSocket = i;
+        if (playerNext != undefined) {
+          var scoreNext = playerNext.points;
+          if  (scoreNext > highScore) {
+            highScore = scoreNext;
+            highSocket = i;
+          }
         }
       }
     }

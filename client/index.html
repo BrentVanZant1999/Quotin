@@ -71,7 +71,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <div id="feedbackArea" class="negativeColor">You got it! You get 12 points.</div>
+              <div id="feedbackArea" class="negativeColor hiddenArea"></div>
             </div>
           </div>
           <div class="row">
@@ -81,7 +81,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <button id="submit-input-button">Submit</button>
+              <button id="submit-input-button">Submit <span id="submit-timer"></span></button>
             </div>
           </div>
           <div class="row">
@@ -93,7 +93,7 @@
             <div class="col">
               <div id="chat-text" style="width:300px;height:200px;overflow:hidden">
                 <span>hello</span>
-              </div
+              </div>
               <form id="chat-form">
                   <input id="chat-input" type="text" style="width:300px"></input>
               </form>
@@ -226,11 +226,12 @@
   var chatForm = document.getElementById('chat-form');
   var roomDisplay = document.getElementById('roomDisplay');
   var playerData = document.getElementById('playerData');
-  var quoteArea = document.getElementById('quoteArea')
+  var quoteArea = document.getElementById('quoteArea');
   var feedback = document.getElementById('feedbackArea');
   var firstPlaceScore = document.getElementById('topData');
   var inputAnswer = document.getElementById('submit-input-answer');
   var inputButton = document.getElementById('submit-input-button');
+  var inputTimer = document.getElementById('submit-timer');
   //define room selection buttons
   var movieButton = document.getElementById('movie-chat-button');
   var gameButton = document.getElementById('game-chat-button');
@@ -262,7 +263,7 @@
     feedback.innerHTML += data;
   });
 
-  socket.on('firstPlaceDisplay',function(data)) {
+  socket.on('firstPlaceDisplay',function(data) {
     firstPlaceScore.innerHTML = data.displayString;
   });
 
@@ -288,11 +289,18 @@
     quoteArea.innerHTML = data.display;
   });
 
+  socket.on('timeLeft',function(data) {
+    inputTimer.innerHTML = data.display;
+  });
+
   socket.on('feedBack',function(data) {
     var boolDisplay = data.displayBool;
     if ( boolDisplay == true ) {
       feedback.classList.remove('hiddenArea');
       feedback.classList.add('visibleArea');
+      feedback.classList.remove('negativeColor');
+      feedback.classList.remove('positiveColor');
+      feedback.classList.add('positiveColor');
     }
     else {
       feedback.classList.remove('visibleArea');
