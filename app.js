@@ -19,37 +19,10 @@ console.log("Server Started");
 var SOCKET_LIST = {};
 var GENERAL_LIST = {};
 var GAME_LIST = {};
-var BOOK_LIST = {};
-var MOVIE_LIST = {};
 
-//quote and answer storage lists
-var BOOK_QUOTE_LIST = [
-    "You don’t have to live forever, you just have to live.",
-    "I would always rather be happy than dignified.",
-    "For what you see and hear depends a good deal on where you are standing.",
-    "Of course, it is happening inside your head, Harry, but why on earth should that mean that it is not real?",
+//quote list
 ];
-
-var BOOK_ANSWER_LIST = [
-    "tuck everlasting",
-    "jane eyre",
-    "The Magician’s Nephew",
-    "Harry Potter and the Deathly Hallows"
-];
-var GAME_QUOTE_LIST = [
-    "We all make choices in life, but in the end our choices make us.",
-    "What is better? To be born good or to overcome your evil nature through great effort?",
-    "Bring me a bucket, and I'll show you a bucket!",
-    "A hero need not speak. When he is gone, the world will speak for him."
-];
-
-var GAME_ANSWER_LIST = [
-    "Bioshock",
-    "Skyrim",
-    "Borderlands 2",
-    "Halo"
-];
-var MOVIE_QUOTE_LIST = [
+var QUOTE_LIST = [
     "I'm going to make him an offer he can't refuse.",
     "You're gonna need a bigger boat.",
     "Carpe diem. Seize the day, boys. Make your lives extraordinary.",
@@ -57,7 +30,7 @@ var MOVIE_QUOTE_LIST = [
     "Let's put a smile on that face!"
 ];
 
-var MOVIE_ANSWER_LIST = [
+var ANSWER_LIST = [
     "The Godfather",
     "Jaws",
     "Dead Poets Society",
@@ -80,20 +53,13 @@ var Game = function(typeNum){
   var self = {
       //variable counts
       playerCount:0,
-      type:typeNum,
       //string handling
       currentString:"test quote",
       promptString:"",
       acceptedAnswer:"Alexander Hamilton",
-
-      //first place handling
-      firstPlaceSocket:undefined,
-      firstPlaceScore:0,
-
       //round counter
-      round:0,
-
       //timing handling
+      round:0,
       msLeft: 1000,
       isWaitingForGame: true,
       internalTime:30,
@@ -109,27 +75,10 @@ var Game = function(typeNum){
   }
 
   self.getNewQuote = function(){
-    //movie type
-    if (self.type == 0) {
-      var randomQuoteNum = Math.floor( Math.random() * MOVIE_QUOTE_LIST.length );
-      self.currentString  = MOVIE_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = MOVIE_ANSWER_LIST[randomQuoteNum].toLowerCase();
-      console.log("Accepted Movie:" + self.acceptedAnswer);
-    }
-    //game type
-    else if (self.type == 1) {
-      var randomQuoteNum = Math.floor( Math.random() * GAME_QUOTE_LIST.length );
-      self.currentString  = GAME_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = GAME_ANSWER_LIST[randomQuoteNum].toLowerCase();
-        console.log("Accepted Game:" + self.acceptedAnswer);
-    }
-    //book type
-    else if (self.type == 2) {
-      var randomQuoteNum = Math.floor( Math.random() * BOOK_QUOTE_LIST.length );
-      self.currentString  = BOOK_QUOTE_LIST[randomQuoteNum];
-      self.acceptedAnswer  = BOOK_ANSWER_LIST[randomQuoteNum].toLowerCase();
-        console.log("Accepted Book:" + self.acceptedAnswer);
-    }
+    var randomQuoteNum = Math.floor( Math.random() * QUOTE_LIST.length );
+    self.currentString  = QUOTE_LIST[randomQuoteNum];
+    self.acceptedAnswer  = ANSWER_LIST[randomQuoteNum].toLowerCase();
+    console.log("Accepted Answer :" + self.acceptedAnswer);
   }
 
   //through displayString
@@ -137,20 +86,8 @@ var Game = function(typeNum){
     //handle displaying preround
     if (self.isWaitingForGame == true) {
         var toDisplay = GAME_STARTING_STRING + self.externalTime + " seconds.";
-        if (self.type == 0){
-          for (var i in MOVIE_LIST) {
-            MOVIE_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-          }
-        }
-        if (self.type == 1){
-          for (var i in GAME_LIST) {
-            GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-          }
-        }
-        if (self.type == 2){
-          for (var i in BOOK_LIST) {
-            BOOK_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-          }
+        for (var i in GAME_LIST) {
+          GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
         }
     }
     else {
@@ -172,22 +109,9 @@ var Game = function(typeNum){
           toDisplay = GAME_OVER_STRING + self.internalTime + " seconds.";
         }
       }
-
-      //handle displaying strin
-      if (self.type == 0){
-        for (var i in MOVIE_LIST ) {
-          MOVIE_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-        }
-      }
-      if (self.type == 1){
-        for (var i in GAME_LIST ) {
-          GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-        }
-      }
-      if (self.type == 2){
-        for (var i in BOOK_LIST ) {
-          BOOK_LIST[i].emit('stringToDisplay', { display : toDisplay } );
-        }
+      //handle displaying string to all sockets
+      for (var i in GAME_LIST ) {
+        GAME_LIST[i].emit('stringToDisplay', { display : toDisplay } );
       }
     }
   }
@@ -217,8 +141,13 @@ var Game = function(typeNum){
         if ( self.round < 16 ) {
           self.internalTime = 30;
           self.getNewQuote();
+          self.updateLeaderBoard();
+          self.displayLeaderBoard();
         }
         else {
+          self.newGame();
+          self.updateLeaderBoard();
+          self.displayLeaderBoard();
           self.isWaitingForGame = true;
           self.externalTime = 10;
           self.round = 1;
@@ -228,93 +157,22 @@ var Game = function(typeNum){
   }
   //show the right answer
   self.showRightAnswer = function() {
-    if ( self.type == 0 ){
-      for (var i in MOVIE_LIST) {
-        MOVIE_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
-      }
-    }
-    else if ( self.type == 1 ) {
-      for (var i in GAME_LIST) {
-        GAME_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
-      }
-    }
-    else if ( self.type == 2) {
-      for (var i in BOOK_LIST) {
-        BOOK_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
-      }
+    for (var i in GAME_LIST) {
+      GAME_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
     }
   }
   //display top player
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
-    if  (self.firstPlaceSocket != undefined) {
-      var playerName = Player.list[self.firstPlaceSocket].name;
-      var playerPoints = Player.list[self.firstPlaceSocket].points;
-      var dataString = playerName + " is in FIRST with " + playerPoints +" points.";
-      if ( self.type == 0 ){
-        for (var i in MOVIE_LIST) {
-          MOVIE_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
-        }
-      }
-      else if ( self.type == 1 ) {
-        for (var i in GAME_LIST) {
-          GAME_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
-        }
-      }
-      else if ( self.type == 2) {
-        for (var i in BOOK_LIST) {
-          BOOK_LIST[i].emit('firstPlaceDisplay', { displayString: dataString });
-        }
+    for (var i in GAME_LIST) {
+      for (var i in GAME_LIST) {
+        var dataString = "";
+        GAME_LIST[i].emit('firstPlaceDisplay', { displayName: data.name, displayPoints });
       }
     }
   }
 
-  self.updateLeaderBoard = function() {
-    var highSocket = undefined;
-    var highScore = 0;
 
-    if ( self.type == 0 ){
-      for (var i in MOVIE_LIST) {
-        var playerNext = Player.list[i];
-        var scoreNext = playerNext.points;
-        if (playerNext != undefined) {
-          if  (scoreNext > highScore) {
-            highScore = scoreNext;
-            highSocket = i;
-          }
-        }
-      }
-    }
-
-    else if ( self.type == 1 ) {
-      for (var i in GAME_LIST) {
-        var playerNext = Player.list[i];
-        if (playerNext != undefined) {
-          var scoreNext = playerNext.points;
-          if  (scoreNext > highScore) {
-            highScore = scoreNext;
-            highSocket = i;
-          }
-        }
-      }
-    }
-
-    else if ( self.type == 2 ) {
-      for (var i in GAME_LIST) {
-        console.log("in here");
-        var playerNext = Player.list[i];
-        if (playerNext != undefined) {
-          var scoreNext = playerNext.points;
-          if  (scoreNext > highScore) {
-            highScore = scoreNext;
-            highSocket = i;
-          }
-        }
-      }
-    }
-    self.firstPlaceScore = highScore;
-    self.firstPlaceSocket = highSocket;
-  }
 
   self.handleAnswer = function(answer) {
     if (self.internalTime > 10) {
@@ -330,26 +188,23 @@ var Game = function(typeNum){
     }
   }
 
+  //updates all the player scores
+  self.newGame = function() {
+    for (var i in GAME_LIST) {
+      Player.list[i].points = 0;
+    }
+  }
+
+  //create a new round
   self.newRound = function() {
-    //call update essentials depending on game type
-    self.updateEssentials(self.type);
-    self.updateLeaderBoard();
     self.displayLeaderBoard();
   }
 
-  self.updateEssentials = function(type) {
-    if (type == 0){
-      var randomNum =0; //generate a random number from array length
-      self.acceptedAnswer = 0; //create an answer array for each type
-      self.currentString = 0; //and a quote array
-    }
-  }
   return self;
+
 }
 
-var gameGame = Game(0);
-var bookGame = Game(1);
-var movieGame = Game(2);
+var game = Game();
 
 var Entity = function(){
     var self = {
@@ -389,8 +244,8 @@ var Player = function(id, playerName){
           if ( gameGame.handleAnswer(answerFiltered) > 0 ) {
             displayString = "Right Answer!";
             displayBoolVal = true;
-            //add in point generation
-          }
+            self.points += 3;
+           }
           else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
             displayString = "Wrong Answer!";
             displayBoolVal = true;
@@ -450,6 +305,15 @@ Player.onConnect = function(socket, playerName){
     });
 }
 Player.onDisconnect = function(socket){
+    if (Player.list[socket.id].room == 1) {
+      movieGame.removePlayer();
+    }
+    else if (Player.list[socket.id].room == 2) {
+      gameGame.removePlayer();
+    }
+    else if (Player.list[socket.id].room == 3) {
+      bookGame.removePlayer();
+    }
     delete Player.list[socket.id];
 }
 
@@ -474,16 +338,19 @@ var gotoRoom= function(socket,roomNumber){
     MOVIE_LIST[socket.id] = socket;
     Player.list[socket.id].room = 1;
     socket.emit('changeRoom',{roomName:"Movies"});
+    movieGame.addPlayer();
   }
   else if (roomNumber == 2 ) {
     GAME_LIST[socket.id] = socket;
     Player.list[socket.id].room = 2;
     socket.emit('changeRoom',{roomName:"Games"});
+    gameGame.addPlayer();
   }
   else if (roomNumber == 3 ) {
     BOOK_LIST[socket.id] = socket;
     Player.list[socket.id].room = 3;
     socket.emit('changeRoom',{roomName:"Books"});
+    bookGame.addPlayer();
   }
 }
 
