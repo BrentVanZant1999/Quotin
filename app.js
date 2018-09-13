@@ -121,14 +121,14 @@ var Game = function(typeNum){
       var randomQuoteNum = Math.floor( Math.random() * GAME_QUOTE_LIST.length );
       self.currentString  = GAME_QUOTE_LIST[randomQuoteNum];
       self.acceptedAnswer  = GAME_ANSWER_LIST[randomQuoteNum].toLowerCase();
-        console.log("Accepted Movie:" + self.acceptedAnswer);
+        console.log("Accepted Game:" + self.acceptedAnswer);
     }
     //book type
     else if (self.type == 2) {
       var randomQuoteNum = Math.floor( Math.random() * BOOK_QUOTE_LIST.length );
       self.currentString  = BOOK_QUOTE_LIST[randomQuoteNum];
       self.acceptedAnswer  = BOOK_ANSWER_LIST[randomQuoteNum].toLowerCase();
-        console.log("Accepted Movie:" + self.acceptedAnswer);
+        console.log("Accepted Book:" + self.acceptedAnswer);
     }
   }
 
@@ -226,7 +226,25 @@ var Game = function(typeNum){
       }
     }
   }
-  //display top players
+  //show the right answer
+  self.showRightAnswer = function() {
+    if ( self.type == 0 ){
+      for (var i in MOVIE_LIST) {
+        MOVIE_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
+      }
+    }
+    else if ( self.type == 1 ) {
+      for (var i in GAME_LIST) {
+        GAME_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
+      }
+    }
+    else if ( self.type == 2) {
+      for (var i in BOOK_LIST) {
+        BOOK_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
+      }
+    }
+  }
+  //display top player
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
     if  (self.firstPlaceSocket != undefined) {
@@ -362,7 +380,7 @@ var Player = function(id, playerName){
       var displayString = self.rank + "- " + self.name +"- " + self.points;
       socket.emit('playerInfo', { displayValue : displayString } );
     }
-    //
+    //handle a players submission
     self.handleSubmission = function( answer, socket ){
         var answerFiltered = answer.toLowerCase();
         var displayString = "";
@@ -371,6 +389,7 @@ var Player = function(id, playerName){
           if ( gameGame.handleAnswer(answerFiltered) > 0 ) {
             displayString = "Right Answer!";
             displayBoolVal = true;
+            //add in point generation
           }
           else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
             displayString = "Wrong Answer!";

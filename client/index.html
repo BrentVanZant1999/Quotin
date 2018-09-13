@@ -259,6 +259,11 @@
     chatText.innerHTML += '<div>' + data + '</div>';
   });
 
+  socket.on('timerDisplay', function(data) {
+    if (data.display >= 10 ) {
+
+    }
+  });
   socket.on('answerFeedback',function(data) {
     feedback.innerHTML += data;
   });
