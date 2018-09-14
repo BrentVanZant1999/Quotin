@@ -224,7 +224,6 @@ var Player = function(id, playerName){
     self.id = id;
     self.name = playerName;
     self.points = 0;
-    self.room = 0;
     self.rank = 0;
     //adds points to player object.
     self.addPoints = function( points ){
@@ -237,50 +236,22 @@ var Player = function(id, playerName){
     }
     //handle a players submission
     self.handleSubmission = function( answer, socket ){
-        var answerFiltered = answer.toLowerCase();
-        var displayString = "";
-        var displayBoolVal = true;
-        if (self.room == 1){
-          if ( gameGame.handleAnswer(answerFiltered) > 0 ) {
-            displayString = "Right Answer!";
-            displayBoolVal = true;
-            self.points += 3;
-           }
-          else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
-            displayString = "Wrong Answer!";
-            displayBoolVal = true;
-          }
-          else {
-            displayBoolVal = false;
-          }
-        }
-        else if (self.room == 2){
-          if ( movieGame.handleAnswer(answerFiltered) > 0 ) {
-            displayString = "Right Answer!";
-            displayBoolVal = true;
-          }
-          else if ( movieGame.handleAnswer(answerFiltered) == 0 ) {
-            displayString = "Wrong Answer!";
-            displayBoolVal = true;
-          }
-          else {
-            displayBoolVal = false;
-          }
-        }
-        else if (self.room == 3){
-          if ( bookGame.handleAnswer(answerFiltered) > 0 ) {
-            displayString = "Right Answer!";
-            displayBoolVal = true;
-          }
-          else if ( bookGame.handleAnswer(answerFiltered) == 0 ) {
-            displayString = "Wrong Answer!";
-            displayBoolVal = true;
-          }
-          else {
-            displayBoolVal = false;
-          }
-        }
-        socket.emit('feedBack', { displayValue : displayString, displayBool : displayBoolVal } );
+      var answerFiltered = answer.toLowerCase();
+      var displayString = "";
+      var displayBoolVal = true;
+      if ( game.handleAnswer(answerFiltered) > 0 ) {
+        displayString = "Right Answer!";
+        displayBoolVal = true;
+        self.points += 3;
+       }
+      else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
+        displayString = "Wrong Answer!";
+        displayBoolVal = true;
+      }
+      else {
+        displayBoolVal = false;
+      }
+      socket.emit('feedBack', { displayValue : displayString, displayBool : displayBoolVal } );
     }
     Player.list[id] = self;
     return self;
@@ -305,15 +276,7 @@ Player.onConnect = function(socket, playerName){
     });
 }
 Player.onDisconnect = function(socket){
-    if (Player.list[socket.id].room == 1) {
-      movieGame.removePlayer();
-    }
-    else if (Player.list[socket.id].room == 2) {
-      gameGame.removePlayer();
-    }
-    else if (Player.list[socket.id].room == 3) {
-      bookGame.removePlayer();
-    }
+    game.removePlayer();
     delete Player.list[socket.id];
 }
 
@@ -325,82 +288,58 @@ var USERS = {
     "Brent":"password",
 }
 var gotoRoom= function(socket,roomNumber){
-  delete GENERAL_LIST[socket.id];
-  delete MOVIE_LIST[socket.id];
   delete GAME_LIST[socket.id];
-  delete BOOK_LIST[socket.id];
-  if (roomNumber == 0 ) {
-    GENERAL_LIST[socket.id] = socket;
-    Player.list[socket.id].room = 0;
-    socket.emit('changeRoom',{roomName:"General"});
-  }
-  else if (roomNumber == 1 ) {
-    MOVIE_LIST[socket.id] = socket;
-    Player.list[socket.id].room = 1;
-    socket.emit('changeRoom',{roomName:"Movies"});
-    movieGame.addPlayer();
-  }
-  else if (roomNumber == 2 ) {
-    GAME_LIST[socket.id] = socket;
-    Player.list[socket.id].room = 2;
-    socket.emit('changeRoom',{roomName:"Games"});
-    gameGame.addPlayer();
-  }
-  else if (roomNumber == 3 ) {
-    BOOK_LIST[socket.id] = socket;
-    Player.list[socket.id].room = 3;
-    socket.emit('changeRoom',{roomName:"Books"});
-    bookGame.addPlayer();
-  }
+  GAME_LIST[socket.id] = socket;
 }
 
 var isValidPassword = function(data,cb){
-    setTimeout(function(){
-        cb(USERS[data.username] === data.password);
-    },10);
+  setTimeout(function(){
+  cb(USERS[data.username] === data.password);
+  },10);
 }
 var isUsernameTaken = function(data,cb){
     setTimeout(function(){
-        cb(USERS[data.username]);
+      cb(USERS[data.username]);
     },10);
 }
 var addUser = function(data,cb){
-    setTimeout(function(){
-        USERS[data.username] = data.password;
-        cb();
-    },10);
+  setTimeout(function(){
+    USERS[data.username] = data.password;
+    cb();
+  },10);
 }
 
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
-  console.log("connection");
-
-    socket.id = Math.random();
-    SOCKET_LIST[socket.id] = socket;
-    socket.on('signIn',function(data){
-        isValidPassword(data,function(res){
-            if(res){
-                Player.onConnect(socket, data.username);
-                socket.emit('signInResponse',{success:true});
-            } else {
-                socket.emit('signInResponse',{success:false});
-            }
-        });
+  socket.id = Math.random();
+  SOCKET_LIST[socket.id] = socket;
+  //sign in socket
+  socket.on('signIn',function(data){
+    isValidPassword(data,function(res){
+      if(res){
+        Player.onConnect(socket, data.username);
+        socket.emit('signInResponse',{success:true});
+      }
+      else {
+        socket.emit('signInResponse',{success:false});
+      }
     });
+  });
 
-    //sign up
-    socket.on('signUp',function(data){
-        isUsernameTaken(data,function(res){
-            if(res){
-                socket.emit('signUpResponse',{success:false});
-            } else {
-                addUser(data,function(){
-                    socket.emit('signUpResponse',{success:true});
-                });
-                Player.onConnect(socket, data.username);
-            }
+  //sign up
+  socket.on('signUp',function(data){
+    isUsernameTaken(data,function(res){
+      if(res) {
+        socket.emit('signUpResponse',{success:false});
+      }
+      else {
+        addUser(data,function(){
+          socket.emit('signUpResponse',{success:true});
         });
+        Player.onConnect(socket, data.username);
+      }
     });
+  });
     //continue
     socket.on('continue',function(data){
       socket.emit('signInResponse',{success:true});
@@ -412,37 +351,11 @@ io.sockets.on('connection', function(socket){
     });
 
     socket.on('sendMsgToServer',function(data){
-        var playerName = Player.list[socket.id].name;
-        var roomNumber = Player.list[socket.id].room;
-        if (roomNumber == 0 ) {
-          for(var i in GENERAL_LIST){
-              GENERAL_LIST[i].emit('addToChat',playerName + ': ' + data);
-          }
-
-        }
-        else if (roomNumber == 1 ) {
-          for(var i in MOVIE_LIST){
-            MOVIE_LIST[i].emit('addToChat',playerName + ': ' + data);
-          }
-        }
-        else if (roomNumber == 2 ) {
-
-          for(var i in GAME_LIST){
-            GAME_LIST[i].emit('addToChat',playerName + ': ' + data);
-          }
-        }
-        else if (roomNumber == 3 ) {
-          for(var i in BOOK_LIST){
-            BOOK_LIST[i].emit('addToChat',playerName + ': ' + data);
-          }
-        }
-    });
-
-    socket.on('evalServer',function(data){
-        if(!DEBUG)
-            return;
-        var res = eval(data);
-        socket.emit('evalAnswer',res);
+      var playerName = Player.list[socket.id].name;
+      var roomNumber = Player.list[socket.id].room;
+      for(var i in GAME_LIST){
+        GAME_LIST[i].emit('addToChat',playerName + ': ' + data);
+      }
     });
 });
 
