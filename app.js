@@ -102,6 +102,11 @@ var Game = function(typeNum){
       }
       //handle displaying results
       else {
+        //display the correct answer
+        var answerToShow = self.acceptedAnswer;
+        for (var i in GAME_LIST ) {
+          GAME_LIST[i].emit('correctAnswerDisplay', { display : answerToShow } );
+        }
         if ( self.round<15 ) {
           toDisplay = ROUND_OVER_STRING + self.internalTime + " seconds.";
         }
@@ -161,12 +166,26 @@ var Game = function(typeNum){
       GAME_LIST[i].emit('rightAnswer', { displayString: self.acceptedAnswer });
     }
   }
+
+  //show the right answer
+  self.showTimeLeft= function() {
+    for (var i in GAME_LIST) {
+      if (self.internalTime > 10) {
+        GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime, displayBool: true });
+      }
+      else {
+        GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime, displayBool: false });
+      }
+
+    }
+  }
+
   //display top player
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
     for (var i in GAME_LIST) {
       for (var i in GAME_LIST) {
-        var dataString = "";
+        //setup variables
         GAME_LIST[i].emit('firstPlaceDisplay', { displayName: data.name, displayPoints });
       }
     }
