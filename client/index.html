@@ -69,6 +69,7 @@
               <div id="quoteArea">"I am a quote"</div>
             </div>
           </div>
+          <!-- Answer Entering -->
           <div class="row">
             <div class="col">
               <div id="feedbackArea" class="negativeColor hiddenArea"></div>
@@ -84,6 +85,8 @@
               <button id="submit-input-button">Submit <span id="submit-timer"></span></button>
             </div>
           </div>
+          <!-- End Answer Entering -->
+          <!-- Chat Section -->
           <div class="row">
             <div class="col">
               <div class="labelFor">Chat Room</div>
@@ -99,43 +102,13 @@
               </form>
             </div>
           </div>
+            <!-- End Chat Section -->
           <div class="row">
-            <div class="col">
-              <div id="topData"></div>
-            </div>
+            <div id="playersData" class="col"></div>
           </div>
-          <div class="row">
-            <div class="col">
-              <div id="playerData" class="positiveColor" >12- - points</div>
-            </div>
-          </div>
+
         </div>
         <!-- Game Div end -->
-
-
-        <!-- Room Select Div start -->
-        <div id="selectDiv" class="hiddenArea">
-          <div class="row">
-            <div class="col">
-              <button id="movie-chat-button" class="selectButton">Movie Chat</button>
-            </div>
-            <div class="col">
-              <button id="game-chat-button" class="selectButton">Game Chat</button>
-
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button id="book-chat-button" class="selectButton">Book Chat</button>
-            </div>
-            <div class="col">
-              <button class="selectButton invalidButton">Coming Soon</button>
-            </div>
-          </div>
-        </div>
-
-
-        <!-- room select div done -->
       </div>
     </div>
   </div>
@@ -163,6 +136,7 @@
     socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
   }
 
+  //handle signing in button
   signDivSignIn.onclick = function(){
     if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
       socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
@@ -174,7 +148,7 @@
       alertArea.innerHTML = "Fields Missing";
     }
   }
-
+  //handling sign up button
   signDivSignUp.onclick = function(){
     if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
       socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});

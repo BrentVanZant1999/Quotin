@@ -184,6 +184,7 @@ var Game = function(typeNum){
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
     for (var i in GAME_LIST) {
+      GAME_LIST[i].emit('clearPlayerList', { boolDisplay:false });
       var displaySocketName = Player.list[i.id].name;
       var displaySocketPoints = Player.list[i.id].points;
       for (var i in GAME_LIST) {
@@ -192,11 +193,10 @@ var Game = function(typeNum){
     }
   }
 
-
   //handle an answer submission
   self.handleAnswer = function(answer) {
     if (self.internalTime > 10) {
-      //handle correct answer 
+      //handle correct answer
       if (answer == self.acceptedAnswer) {
         return self.internalTime-10;
       }
@@ -220,13 +220,12 @@ var Game = function(typeNum){
   self.newRound = function() {
     self.displayLeaderBoard();
   }
-
   return self;
-
 }
 
 var game = Game();
 
+//define the entity object
 var Entity = function(){
     var self = {
         room:-1,
@@ -234,20 +233,22 @@ var Entity = function(){
         id:"",
         name:"",
     }
+    //handle updating this entities points
     self.updatePoints = function(inputPoints){
         self.points += self.inputPoints;
     }
     return self;
 }
 
+//define the player object
 var Player = function(id, playerName){
     var self = Entity();
     self.id = id;
     self.name = playerName;
     self.points = 0;
     self.rank = 0;
-    //adds points to player object.
     self.addPoints = function( points ){
+      //adds points to player object.
       self.updatePoints( points );
     }
     //gets player stats and emits them to player
