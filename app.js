@@ -184,17 +184,19 @@ var Game = function(typeNum){
   self.displayLeaderBoard = function(){
     self.updateLeaderBoard();
     for (var i in GAME_LIST) {
+      var displaySocketName = Player.list[i.id].name;
+      var displaySocketPoints = Player.list[i.id].points;
       for (var i in GAME_LIST) {
-        //setup variables
-        GAME_LIST[i].emit('firstPlaceDisplay', { displayName: data.name, displayPoints });
+        GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
       }
     }
   }
 
 
-
+  //handle an answer submission
   self.handleAnswer = function(answer) {
     if (self.internalTime > 10) {
+      //handle correct answer 
       if (answer == self.acceptedAnswer) {
         return self.internalTime-10;
       }
@@ -277,7 +279,7 @@ var Player = function(id, playerName){
 }
 
 Player.list = {};
-
+//handle player connection
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
     //call to handle room movement
@@ -294,11 +296,11 @@ Player.onConnect = function(socket, playerName){
       player.handleSubmission( answer, socket );
     });
 }
+//handle player disconnection
 Player.onDisconnect = function(socket){
     game.removePlayer();
     delete Player.list[socket.id];
 }
-
 
 var DEBUG = true;
 
@@ -306,7 +308,8 @@ var USERS = {
     //username:password structures
     "Brent":"password",
 }
-var gotoRoom= function(socket,roomNumber){
+v
+ar gotoRoom= function(socket,roomNumber){
   delete GAME_LIST[socket.id];
   GAME_LIST[socket.id] = socket;
 }
