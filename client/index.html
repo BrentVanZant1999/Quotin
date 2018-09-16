@@ -160,7 +160,19 @@
       alertArea.innerHTML = "Fields Missing";
     }
   }
+  //handle clearing list of players
+  socket.on('clearPlayerList',function(data){
+    //clear the list of players
+      playersData.innerHTML = "";
+  });
 
+  //handle displaying players
+  socket.on('displayPlayer',function(data){
+    var playerData = data.name + "- " + data.points + " points"
+    playersData.innerHTML += '<div>' + playerData + '</div>';
+  });
+
+  //handle recieving a response from sign in call
   socket.on('signInResponse',function(data){
     if(data.success){
       signDiv.classList.remove('visibleArea');
