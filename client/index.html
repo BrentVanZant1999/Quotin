@@ -104,7 +104,7 @@
           </div>
             <!-- End Chat Section -->
           <div class="row">
-            <div id="playersData" class="col"></div>
+            <div id="playerData" class="col"></div>
           </div>
 
         </div>
@@ -121,7 +121,6 @@
   //main game divs
   var signDiv = document.getElementById('signDiv');
   var gameDiv = document.getElementById('gameDiv');
-  var selectDiv = document.getElementById('selectDiv');
 
   var signDivUsername = document.getElementById('signDiv-username');
   var signDivSignIn = document.getElementById('signDiv-signIn');
@@ -131,7 +130,7 @@
   var signDivContinue = document.getElementById('continueButtonWrapper');
   var alertArea = document.getElementById('alertArea');
   var playerData = document.getElementById('playerData');
-  var timerData = document.getElementByID('timerData');
+  var timerData = document.getElementById('timerData');
   //handle continue button being clicked - take user to next room
   signDivContinue.onclick =  function(){
     socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
@@ -186,8 +185,8 @@
     if(data.success){
       signDiv.classList.remove('visibleArea');
       signDiv.classList.add('hiddenArea');
-      selectDiv.classList.remove('hiddenArea');
-      selectDiv.classList.add('visibleArea');
+      gameDiv.classList.remove('hiddenArea');
+      gameDiv.classList.add('visibleArea');
       isPlaying = true;
     } else
       alertArea.classList.remove('hiddenArea');
@@ -227,27 +226,11 @@
   var inputAnswer = document.getElementById('submit-input-answer');
   var inputButton = document.getElementById('submit-input-button');
   var inputTimer = document.getElementById('submit-timer');
-  //define room selection buttons
-  var movieButton = document.getElementById('movie-chat-button');
-  var gameButton = document.getElementById('game-chat-button');
-  var bookButton = document.getElementById('book-chat-button');
 
   inputButton.onclick = function() {
     var inputVal = inputAnswer.value;
     socket.emit('answerSubmit', { answer : inputVal });
     inputAnswer.value = "";
-  }
-
-  movieButton.onclick = function() {
-    socket.emit('roomButton', { roomNumber : 1 });
-  }
-
-  gameButton.onclick = function() {
-    socket.emit('roomButton', { roomNumber : 2 });
-  }
-
-  bookButton.onclick = function() {
-    socket.emit('roomButton', { roomNumber : 3 });
   }
 
   socket.on('addToChat',function(data) {

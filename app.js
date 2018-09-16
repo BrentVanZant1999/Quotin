@@ -20,8 +20,7 @@ var SOCKET_LIST = {};
 var GENERAL_LIST = {};
 var GAME_LIST = {};
 
-//quote list
-];
+//quote list to keep tracks of quotes in this database of sorts
 var QUOTE_LIST = [
     "I'm going to make him an offer he can't refuse.",
     "You're gonna need a bigger boat.",
@@ -29,7 +28,7 @@ var QUOTE_LIST = [
     "Here's Johnny!",
     "Let's put a smile on that face!"
 ];
-
+//answer list to keep tracks of quotes- MUST MATCH QUOTES
 var ANSWER_LIST = [
     "The Godfather",
     "Jaws",
@@ -146,12 +145,10 @@ var Game = function(typeNum){
         if ( self.round < 16 ) {
           self.internalTime = 30;
           self.getNewQuote();
-          self.updateLeaderBoard();
           self.displayLeaderBoard();
         }
         else {
           self.newGame();
-          self.updateLeaderBoard();
           self.displayLeaderBoard();
           self.isWaitingForGame = true;
           self.externalTime = 10;
@@ -182,7 +179,6 @@ var Game = function(typeNum){
 
   //display top player
   self.displayLeaderBoard = function(){
-    self.updateLeaderBoard();
     for (var i in GAME_LIST) {
       GAME_LIST[i].emit('clearPlayerList', { boolDisplay:false });
       var displaySocketName = Player.list[i.id].name;
@@ -303,14 +299,14 @@ Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
 }
 
-var DEBUG = true;
 
+//user holding structure
 var USERS = {
-    //username:password structures
+
     "Brent":"password",
 }
-v
-ar gotoRoom= function(socket,roomNumber){
+//handle entering the player into the game
+var gotoRoom= function(socket,roomNumber){
   delete GAME_LIST[socket.id];
   GAME_LIST[socket.id] = socket;
 }
@@ -382,9 +378,7 @@ io.sockets.on('connection', function(socket){
     });
 });
 
-//set a .1 second interval to pass time in each game object
+//set a .1 second interval to pass time in the game object
 setInterval(function(){
-  gameGame.passTime(100);
-  bookGame.passTime(100);
-  movieGame.passTime(100);
+  game.passTime(100);
 },100);
