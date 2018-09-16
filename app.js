@@ -171,7 +171,7 @@ var Game = function(typeNum){
   self.showTimeLeft= function() {
     for (var i in GAME_LIST) {
       if (self.internalTime > 10) {
-        GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime, displayBool: true });
+        GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime-10, displayBool: true });
       }
       else {
         GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime, displayBool: false });

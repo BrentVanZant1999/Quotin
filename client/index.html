@@ -130,7 +130,8 @@
   var signDivInputs = document.getElementById('introButtonWrapper');
   var signDivContinue = document.getElementById('continueButtonWrapper');
   var alertArea = document.getElementById('alertArea');
-
+  var playerData = document.getElementById('playerData');
+  var timerData = document.getElementByID('timerData');
   //handle continue button being clicked - take user to next room
   signDivContinue.onclick =  function(){
     socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
@@ -164,6 +165,14 @@
   socket.on('clearPlayerList',function(data){
     //clear the list of players
       playersData.innerHTML = "";
+  });
+
+  socket.on('timeLeft',function(data){
+    //clear the list of players
+    if (data.displayBool == true) {
+      timerData.innerHTML = data.displayString;
+    }
+      timerData.innerHTML =  "";
   });
 
   //handle displaying players
