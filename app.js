@@ -26,7 +26,26 @@ var QUOTE_LIST = [
     "You're gonna need a bigger boat.",
     "Carpe diem. Seize the day, boys. Make your lives extraordinary.",
     "Here's Johnny!",
-    "Let's put a smile on that face!"
+    "Let's put a smile on that face!",
+    "Here's looking at you, kid.",
+    "Toto, I've got a feeling we're not in Kansas anymore."
+    "A census taker once tried to test me. I ate his liver with some fava beans and a nice Chianti.",
+    "Show me the money!",
+    "Mama always said life was like a box of chocolates. You never know what you're gonna get.",
+    "Greed, for lack of a better word, is good.",
+    "As God is my witness, I'll never be hungry again.",
+    "Keep your friends close, but your enemies closer.",
+    "Get your stinking paws off me, you damned dirty ape.",
+    "Open the pod bay doors, HAL.",
+    "My precious.",
+    "A martini. Shaken, not stirred.",
+    "Nobody puts Baby in a corner.",
+    "I'm king of the world!",
+    "Cinderella story. Outta nowhere. A former greenskeeper, now, about to become the Masters champion. It looks like a mirac...It's in the hole! It's in the hole! It's in the hole!",
+    "They may take our lives, but they'll never take our freedom!",
+    "If you let my daughter go now, that'll be the end of it. I will not look for you, I will not pursue you. But if you don't, I will look for you, I will find you, and I will kill you.",
+    "It was Beauty killed the Beast.",
+    "I'm just one stomach flu away from my goal weight."
 ];
 //answer list to keep tracks of quotes- MUST MATCH QUOTES
 var ANSWER_LIST = [
@@ -34,7 +53,26 @@ var ANSWER_LIST = [
     "Jaws",
     "Dead Poets Society",
     "The Shining",
-    "The Dark Knight"
+    "The Dark Knight",
+    "Casablanca",
+    "The Wizard of Oz",
+    "The Silence of the Lambs",
+    "Jerry Maguire",
+    "Forrest Gump",
+    "Wall Street",
+    "Gone With the Wind",
+    "The Godfather II",
+    "Planet of the Apes",
+    "2001: A Space Odyssey",
+    "The Lord of the Rings: Two Towers",
+    "Goldfinger",
+    "Dirty Dancing",
+    "Titanic",
+    "Caddyshack",
+    "Braveheart",
+    "Taken",
+    "King Kong",
+    "The Devil Wears Prada"
 ];
 
 
@@ -145,6 +183,7 @@ var Game = function(typeNum){
         if ( self.round < 16 ) {
           self.internalTime = 30;
           self.getNewQuote();
+          self.newRound();
           self.displayLeaderBoard();
         }
         else {
@@ -168,6 +207,7 @@ var Game = function(typeNum){
   self.showTimeLeft= function() {
     for (var i in GAME_LIST) {
       if (self.internalTime > 10) {
+        console.log("time left: " +self.internalTime);
         GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime-10, displayBool: true });
       }
       else {
@@ -181,10 +221,12 @@ var Game = function(typeNum){
   self.displayLeaderBoard = function(){
     for (var i in GAME_LIST) {
       GAME_LIST[i].emit('clearPlayerList', { boolDisplay:false });
-      var displaySocketName = Player.list[i.id].name;
-      var displaySocketPoints = Player.list[i.id].points;
-      for (var i in GAME_LIST) {
-        GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
+      if (Player.list[i] != undefined ) {
+        var displaySocketName = Player.list[i].name;
+        var displaySocketPoints = Player.list[i].points;
+        for (var i in GAME_LIST) {
+          GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
+        }
       }
     }
   }
@@ -214,7 +256,9 @@ var Game = function(typeNum){
 
   //create a new round
   self.newRound = function() {
-    self.displayLeaderBoard();
+    for (var i in GAME_LIST) {
+      GAME_LIST[i].emit('feedBack', { displayValue : "Make a guess!", displayBool : true } );
+    }
   }
   return self;
 }
@@ -247,11 +291,7 @@ var Player = function(id, playerName){
       //adds points to player object.
       self.updatePoints( points );
     }
-    //gets player stats and emits them to player
-    self.getStats = function( socket ){
-      var displayString = self.rank + "- " + self.name +"- " + self.points;
-      socket.emit('playerInfo', { displayValue : displayString } );
-    }
+
     //handle a players submission
     self.handleSubmission = function( answer, socket ){
       var answerFiltered = answer.toLowerCase();
@@ -262,7 +302,7 @@ var Player = function(id, playerName){
         displayBoolVal = true;
         self.points += 3;
        }
-      else if ( gameGame.handleAnswer(answerFiltered) == 0 ) {
+      else if ( game.handleAnswer(answerFiltered) == 0 ) {
         displayString = "Wrong Answer!";
         displayBoolVal = true;
       }
@@ -280,13 +320,7 @@ Player.list = {};
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
     //call to handle room movement
-    socket.on('roomButton',function(data){
-      gotoRoom(socket,data.roomNumber);
-    });
-    //call to get  the players stats
-    socket.on('getStats',function(data){
-      player.getStats(socket);
-    });
+    gotoRoom(socket);
     //call to submit a player answe
     socket.on('answerSubmit',function(data){
       var answer = data.answer;
@@ -306,8 +340,7 @@ var USERS = {
     "Brent":"password",
 }
 //handle entering the player into the game
-var gotoRoom= function(socket,roomNumber){
-  delete GAME_LIST[socket.id];
+var gotoRoom= function(socket){
   GAME_LIST[socket.id] = socket;
 }
 
@@ -361,6 +394,7 @@ io.sockets.on('connection', function(socket){
   });
     //continue
     socket.on('continue',function(data){
+      gotoRoom(socket)
       socket.emit('signInResponse',{success:true});
     });
 

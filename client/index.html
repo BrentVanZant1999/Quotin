@@ -163,7 +163,7 @@
   //handle clearing list of players
   socket.on('clearPlayerList',function(data){
     //clear the list of players
-      playersData.innerHTML = "";
+      playerData.innerHTML = "";
   });
 
   socket.on('timeLeft',function(data){
@@ -176,8 +176,9 @@
 
   //handle displaying players
   socket.on('displayPlayer',function(data){
-    var playerData = data.name + "- " + data.points + " points"
-    playersData.innerHTML += '<div>' + playerData + '</div>';
+    var playerInfo = data.name + "- " + data.points + " points";
+    console.log(playerInfo);
+    playerData.innerHTML += '<div>' + playerInfo + '</div>';
   });
 
   //handle recieving a response from sign in call
@@ -301,11 +302,4 @@
       socket.emit('sendMsgToServer',chatInput.value);
     chatInput.value = '';
   }
-
-  //continually get the player stats
-  setInterval(function(){
-    if (isPlaying) {
-      socket.emit('getStats');
-    }
-  },100);
 </script>
