@@ -247,10 +247,6 @@
     feedback.innerHTML += data;
   });
 
-  socket.on('firstPlaceDisplay',function(data) {
-    firstPlaceScore.innerHTML = data.displayString;
-  });
-
 
   //update the room being displayed to the user
   socket.on('changeRoom',function(data) {
@@ -262,11 +258,6 @@
     chatText.innerHTML = "";
     console.log(data.roomName);
     roomDisplay.innerHTML = data.roomName;
-  });
-
-  //update the player data shown to the player
-  socket.on('playerInfo',function(data) {
-    playerData.innerHTML = data.displayValue;
   });
 
   socket.on('stringToDisplay',function(data) {

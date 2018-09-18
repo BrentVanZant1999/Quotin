@@ -28,7 +28,7 @@ var QUOTE_LIST = [
     "Here's Johnny!",
     "Let's put a smile on that face!",
     "Here's looking at you, kid.",
-    "Toto, I've got a feeling we're not in Kansas anymore."
+    "Toto, I've got a feeling we're not in Kansas anymore.",
     "A census taker once tried to test me. I ate his liver with some fava beans and a nice Chianti.",
     "Show me the money!",
     "Mama always said life was like a box of chocolates. You never know what you're gonna get.",
@@ -44,8 +44,11 @@ var QUOTE_LIST = [
     "Cinderella story. Outta nowhere. A former greenskeeper, now, about to become the Masters champion. It looks like a mirac...It's in the hole! It's in the hole! It's in the hole!",
     "They may take our lives, but they'll never take our freedom!",
     "If you let my daughter go now, that'll be the end of it. I will not look for you, I will not pursue you. But if you don't, I will look for you, I will find you, and I will kill you.",
-    "It was Beauty killed the Beast.",
-    "I'm just one stomach flu away from my goal weight."
+    "It was Beauty that killed the Beast.",
+    "I'm just one stomach flu away from my goal weight.",
+    "Say hello to my little friend!",
+    "There's no place like home.",
+    "Stupid is as stupid does"
 ];
 //answer list to keep tracks of quotes- MUST MATCH QUOTES
 var ANSWER_LIST = [
@@ -72,10 +75,13 @@ var ANSWER_LIST = [
     "Braveheart",
     "Taken",
     "King Kong",
-    "The Devil Wears Prada"
+    "The Devil Wears Prada",
+    "Scarface",
+    "The Wizard of Oz",
+    "Forest Gump"
 ];
 
-
+//some constants
 var GUESSING_TIME = 15;
 var DISPLAY_TIME = 5;
 var RESULTS_TIME = 5;
@@ -158,6 +164,7 @@ var Game = function(typeNum){
     }
   }
 
+  //handle passing of a specific amount of time
   self.passTime = function(timePassed){
     self.msLeft -= timePassed;
     if ( self.msLeft <= 0 ) {
@@ -168,6 +175,7 @@ var Game = function(typeNum){
     self.displayString();
   }
 
+  //handle the passing of a second
   self.handleSecond = function(){
     if ( self.isWaitingForGame ) {
       self.externalTime--;
@@ -196,6 +204,7 @@ var Game = function(typeNum){
       }
     }
   }
+
   //show the right answer
   self.showRightAnswer = function() {
     for (var i in GAME_LIST) {
@@ -221,13 +230,14 @@ var Game = function(typeNum){
   self.displayLeaderBoard = function(){
     for (var i in GAME_LIST) {
       GAME_LIST[i].emit('clearPlayerList', { boolDisplay:false });
+
       if (Player.list[i] != undefined ) {
         var displaySocketName = Player.list[i].name;
         var displaySocketPoints = Player.list[i].points;
+        var counter = 0
         for (var i in GAME_LIST) {
           GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
-        }
-      }
+       }
     }
   }
 
@@ -250,7 +260,9 @@ var Game = function(typeNum){
   //updates all the player scores
   self.newGame = function() {
     for (var i in GAME_LIST) {
-      Player.list[i].points = 0;
+      if (Player.list[i] != undefined) {
+        Player.list[i].points = 0;
+      }
     }
   }
 
@@ -263,6 +275,7 @@ var Game = function(typeNum){
   return self;
 }
 
+//create the main game entry
 var game = Game();
 
 //define the entity object
@@ -336,24 +349,29 @@ Player.onDisconnect = function(socket){
 
 //user holding structure
 var USERS = {
-
-    "Brent":"password",
+    "Admin":"AdminPass1791",
 }
+
 //handle entering the player into the game
 var gotoRoom= function(socket){
   GAME_LIST[socket.id] = socket;
 }
 
+//check if there is a valid password.
 var isValidPassword = function(data,cb){
   setTimeout(function(){
   cb(USERS[data.username] === data.password);
   },10);
 }
+
+//check if the username is already taking
 var isUsernameTaken = function(data,cb){
     setTimeout(function(){
       cb(USERS[data.username]);
     },10);
 }
+
+//add a user to the users array
 var addUser = function(data,cb){
   setTimeout(function(){
     USERS[data.username] = data.password;
@@ -361,6 +379,7 @@ var addUser = function(data,cb){
   },10);
 }
 
+//create the socket io connection
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
   socket.id = Math.random();
