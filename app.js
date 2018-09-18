@@ -45,10 +45,7 @@ var QUOTE_LIST = [
     "They may take our lives, but they'll never take our freedom!",
     "If you let my daughter go now, that'll be the end of it. I will not look for you, I will not pursue you. But if you don't, I will look for you, I will find you, and I will kill you.",
     "It was Beauty that killed the Beast.",
-    "I'm just one stomach flu away from my goal weight.",
-    "Say hello to my little friend!",
-    "There's no place like home.",
-    "Stupid is as stupid does"
+    "I'm just one stomach flu away from my goal weight."
 ];
 //answer list to keep tracks of quotes- MUST MATCH QUOTES
 var ANSWER_LIST = [
@@ -75,10 +72,7 @@ var ANSWER_LIST = [
     "Braveheart",
     "Taken",
     "King Kong",
-    "The Devil Wears Prada",
-    "Scarface",
-    "The Wizard of Oz",
-    "Forest Gump"
+    "The Devil Wears Prada"
 ];
 
 //some constants
@@ -92,7 +86,7 @@ var ROUND_OVER_STRING = "Round finished, new round starting in ";
 
 //define game object
 var Game = function(typeNum){
-  //define self
+  //define instance variables
   var self = {
       //variable counts
       playerCount:0,
@@ -108,15 +102,18 @@ var Game = function(typeNum){
       internalTime:30,
       externalTime:10,
   }
+
   //add a player to count
   self.addPlayer = function(){
     self.playerCount++;
   }
+
   //remove a player from count
   self.removePlayer = function(){
     self.playerCount--;
   }
 
+  //get a new quote
   self.getNewQuote = function(){
     var randomQuoteNum = Math.floor( Math.random() * QUOTE_LIST.length );
     self.currentString  = QUOTE_LIST[randomQuoteNum];
@@ -164,7 +161,7 @@ var Game = function(typeNum){
     }
   }
 
-  //handle passing of a specific amount of time
+  //pass a specific value of time
   self.passTime = function(timePassed){
     self.msLeft -= timePassed;
     if ( self.msLeft <= 0 ) {
@@ -189,12 +186,14 @@ var Game = function(typeNum){
       if ( self.internalTime <= 0) {
         self.round++;
         if ( self.round < 16 ) {
+          //setup a new round
           self.internalTime = 30;
           self.getNewQuote();
           self.newRound();
           self.displayLeaderBoard();
         }
         else {
+          //setup time to set new game
           self.newGame();
           self.displayLeaderBoard();
           self.isWaitingForGame = true;
@@ -212,7 +211,7 @@ var Game = function(typeNum){
     }
   }
 
-  //show the right answer
+  //show the time left
   self.showTimeLeft= function() {
     for (var i in GAME_LIST) {
       if (self.internalTime > 10) {
@@ -238,6 +237,7 @@ var Game = function(typeNum){
         for (var i in GAME_LIST) {
           GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
        }
+     }
     }
   }
 
@@ -275,7 +275,7 @@ var Game = function(typeNum){
   return self;
 }
 
-//create the main game entry
+//create a new game instance
 var game = Game();
 
 //define the entity object
@@ -297,8 +297,7 @@ var Entity = function(){
 var Player = function(id, playerName){
     var self = Entity();
     self.id = id;
-    self.name = playerName;
-    self.points = 0;
+   self.points = 0;
     self.rank = 0;
     self.addPoints = function( points ){
       //adds points to player object.
@@ -328,7 +327,9 @@ var Player = function(id, playerName){
     return self;
 }
 
+//create a list of players
 Player.list = {};
+
 //handle player connection
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
@@ -340,16 +341,16 @@ Player.onConnect = function(socket, playerName){
       player.handleSubmission( answer, socket );
     });
 }
+
 //handle player disconnection
 Player.onDisconnect = function(socket){
     game.removePlayer();
     delete Player.list[socket.id];
 }
 
-
 //user holding structure
 var USERS = {
-    "Admin":"AdminPass1791",
+    "Admin":"AdminPass4132",
 }
 
 //handle entering the player into the game
@@ -357,21 +358,21 @@ var gotoRoom= function(socket){
   GAME_LIST[socket.id] = socket;
 }
 
-//check if there is a valid password.
+//check if an entered password is valid
 var isValidPassword = function(data,cb){
   setTimeout(function(){
   cb(USERS[data.username] === data.password);
   },10);
 }
 
-//check if the username is already taking
+//check if a username is already used for
 var isUsernameTaken = function(data,cb){
     setTimeout(function(){
       cb(USERS[data.username]);
     },10);
 }
 
-//add a user to the users array
+//add a userbase to the list
 var addUser = function(data,cb){
   setTimeout(function(){
     USERS[data.username] = data.password;
@@ -379,8 +380,8 @@ var addUser = function(data,cb){
   },10);
 }
 
-//create the socket io connection
 var io = require('socket.io')(serv,{});
+//create the socekt connection
 io.sockets.on('connection', function(socket){
   socket.id = Math.random();
   SOCKET_LIST[socket.id] = socket;
