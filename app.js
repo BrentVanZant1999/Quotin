@@ -117,7 +117,7 @@ var Game = function(typeNum){
   self.getNewQuote = function(){
     var randomQuoteNum = Math.floor( Math.random() * QUOTE_LIST.length );
     self.currentString  = QUOTE_LIST[randomQuoteNum];
-    self.acceptedAnswer  = ANSWER_LIST[randomQuoteNum].toLowerCase();
+    self.acceptedAnswer  = ANSWER_LIST[randomQuoteNum];
     console.log("Accepted Answer :" + self.acceptedAnswer);
   }
 
@@ -143,7 +143,7 @@ var Game = function(typeNum){
       //handle displaying results
       else {
         //display the correct answer
-        var answerToShow = self.acceptedAnswer;
+        var answerToShow = "Answer: " + self.acceptedAnswer;
         for (var i in GAME_LIST ) {
           GAME_LIST[i].emit('correctAnswerDisplay', { display : answerToShow } );
         }
@@ -183,6 +183,7 @@ var Game = function(typeNum){
     }
     else {
       self.internalTime--;
+      self.showTimeLeft();
       if ( self.internalTime <= 0) {
         self.round++;
         if ( self.round < 16 ) {
@@ -215,7 +216,6 @@ var Game = function(typeNum){
   self.showTimeLeft= function() {
     for (var i in GAME_LIST) {
       if (self.internalTime > 10) {
-        console.log("time left: " +self.internalTime);
         GAME_LIST[i].emit('timeLeft', { displayString: self.internalTime-10, displayBool: true });
       }
       else {
@@ -245,7 +245,7 @@ var Game = function(typeNum){
   self.handleAnswer = function(answer) {
     if (self.internalTime > 10) {
       //handle correct answer
-      if (answer == self.acceptedAnswer) {
+      if (answer == self.acceptedAnswer.toLowerCase()) {
         return self.internalTime-10;
       }
       else {
@@ -270,6 +270,9 @@ var Game = function(typeNum){
   self.newRound = function() {
     for (var i in GAME_LIST) {
       GAME_LIST[i].emit('feedBack', { displayValue : "Make a guess!", displayBool : true } );
+      if (Player.list[i] != undefined) {
+        Player.list[i].hasAnswered = false;
+      }
     }
   }
   return self;
@@ -286,10 +289,6 @@ var Entity = function(){
         id:"",
         name:"",
     }
-    //handle updating this entities points
-    self.updatePoints = function(inputPoints){
-        self.points += self.inputPoints;
-    }
     return self;
 }
 
@@ -297,25 +296,39 @@ var Entity = function(){
 var Player = function(id, playerName){
     var self = Entity();
     self.id = id;
+    self.name=playerName;
    self.points = 0;
     self.rank = 0;
-    self.addPoints = function( points ){
-      //adds points to player object.
-      self.updatePoints( points );
-    }
-
+    self.hasAnswered = false;
     //handle a players submission
     self.handleSubmission = function( answer, socket ){
       var answerFiltered = answer.toLowerCase();
       var displayString = "";
       var displayBoolVal = true;
-      if ( game.handleAnswer(answerFiltered) > 0 ) {
-        displayString = "Right Answer!";
-        displayBoolVal = true;
-        self.points += 3;
+      var answerVal =  game.handleAnswer(answerFiltered);
+      if ( answerVal > 0 ) {
+        if (self.hasAnswered == false ) {
+          displayString = "Correct Answer!";
+          displayBoolVal = true;
+          self.points += answerVal;
+          self.hasAnswered = true;
+        }
        }
-      else if ( game.handleAnswer(answerFiltered) == 0 ) {
-        displayString = "Wrong Answer!";
+      else if (answerVal == 0 ) {
+        var prompt = Math.floor(Math.random() * 4);
+        if (prompt == 0) {
+          displayString = "That's a wrong answer!";
+        }
+        else if (prompt == 1) {
+          displayString = "Oops wrong movie";
+        }
+        else if (prompt == 2) {
+          displayString = "Wrong, guess again?";
+        }
+        else if (prompt == 3) {
+          displayString = "Incorrect!";
+        }
+
         displayBoolVal = true;
       }
       else {
@@ -414,7 +427,7 @@ io.sockets.on('connection', function(socket){
   });
     //continue
     socket.on('continue',function(data){
-      gotoRoom(socket)
+      gotoRoom(socket);
       socket.emit('signInResponse',{success:true});
     });
 

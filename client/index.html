@@ -60,8 +60,6 @@
           </div>
         </div>
         <!--Sign in Div end -->
-
-
         <!-- Game Div  start -->
         <div id="gameDiv" class="hiddenArea" >
           <div class="row">
@@ -82,7 +80,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <button id="submit-input-button">Submit <span id="submit-timer"></span></button>
+              <button id="submit-input-button">Submit<span id="submit-timer"></span></button>
             </div>
           </div>
           <!-- End Answer Entering -->
@@ -166,14 +164,6 @@
       playerData.innerHTML = "";
   });
 
-  socket.on('timeLeft',function(data){
-    //clear the list of players
-    if (data.displayBool == true) {
-      timerData.innerHTML = data.displayString;
-    }
-      timerData.innerHTML =  "";
-  });
-
   //handle displaying players
   socket.on('displayPlayer',function(data){
     var playerInfo = data.name + "- " + data.points + " points";
@@ -196,6 +186,8 @@
       alertArea.innerHTML = "Login Incorrect";
   });
 
+
+  //handle sign up respose
   socket.on('signUpResponse',function(data){
     if(data.success){
       alertArea.classList.remove('hiddenArea');
@@ -228,23 +220,21 @@
   var inputButton = document.getElementById('submit-input-button');
   var inputTimer = document.getElementById('submit-timer');
 
+  //handle answer submission
   inputButton.onclick = function() {
     var inputVal = inputAnswer.value;
     socket.emit('answerSubmit', { answer : inputVal });
     inputAnswer.value = "";
   }
 
+  //handle chat submission
   socket.on('addToChat',function(data) {
     chatText.innerHTML += '<div>' + data + '</div>';
   });
 
-  socket.on('timerDisplay', function(data) {
-    if (data.display >= 10 ) {
-
-    }
-  });
-  socket.on('answerFeedback',function(data) {
-    feedback.innerHTML += data;
+  //handle answer feedback
+  socket.on('correctAnswerDisplay',function(data) {
+    feedback.innerHTML = data.display;
   });
 
 
@@ -260,14 +250,27 @@
     roomDisplay.innerHTML = data.roomName;
   });
 
+  //handle displaying quote
   socket.on('stringToDisplay',function(data) {
+    feedback.classList.remove('hiddenArea');
+    feedback.classList.add('visibleArea');
+    feedback.classList.remove('negativeColor');
+    feedback.classList.remove('positiveColor');
+    feedback.classList.add('negativeColor');
     quoteArea.innerHTML = data.display;
   });
 
+  //handle displaying time left
   socket.on('timeLeft',function(data) {
-    inputTimer.innerHTML = data.display;
+    if (data.displayBool === true) {
+      inputTimer.innerHTML = " ("+data.displayString+ "s)";
+    }
+    else {
+        inputTimer.innerHTML = "";
+    }
   });
 
+  //handle other feedback
   socket.on('feedBack',function(data) {
     var boolDisplay = data.displayBool;
     if ( boolDisplay == true ) {
@@ -283,6 +286,17 @@
     }
     feedback.innerHTML = data.displayValue;
   });
+
+  //handle other feedback
+  socket.on('rightAnswer',function(data) {
+    feedback.classList.remove('hiddenArea');
+    feedback.classList.add('visibleArea');
+    feedback.classList.remove('negativeColor');
+    feedback.classList.remove('positiveColor');
+    feedback.classList.add('positiveColor');
+    feedback.innerHTML = data.displayString;
+  });
+
 
   //
   chatForm.onsubmit = function(e) {
