@@ -348,6 +348,10 @@ Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
     //call to handle room movement
     gotoRoom(socket);
+    //handle showing player in chat
+    for(var i in GAME_LIST){
+      GAME_LIST[i].emit('addToChat',player.name + ' has joined the game.');
+    }
     //call to submit a player answe
     socket.on('answerSubmit',function(data){
       var answer = data.answer;

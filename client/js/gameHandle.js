@@ -16,6 +16,7 @@ var timerData = document.getElementById('timerData');
 //handle continue button being clicked - take user to next room
 signDivContinue.onclick =  function(){
   socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
+  return false;
 }
 
 //handle signing in button
@@ -29,6 +30,7 @@ signDivSignIn.onclick = function(){
     alertArea.classList.add('neutralColor');
     alertArea.innerHTML = "Fields Missing";
   }
+  return false;
 }
 //handling sign up button
 signDivSignUp.onclick = function(){
@@ -41,6 +43,7 @@ signDivSignUp.onclick = function(){
     alertArea.classList.add('neutralColor');
     alertArea.innerHTML = "Fields Missing";
   }
+  return false;
 }
 //handle clearing list of players
 socket.on('clearPlayerList',function(data){
@@ -108,6 +111,7 @@ inputButton.onclick = function() {
   var inputVal = inputAnswer.value;
   socket.emit('answerSubmit', { answer : inputVal });
   inputAnswer.value = "";
+  return false;
 }
 
 //handle chat submission
@@ -176,4 +180,5 @@ chatForm.onsubmit = function(e) {
   else
     socket.emit('sendMsgToServer',chatInput.value);
   chatInput.value = '';
+  return false;
 }

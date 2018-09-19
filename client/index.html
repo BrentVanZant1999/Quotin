@@ -13,42 +13,57 @@
 </head>
 
 <body>
-    <!--Main Navigation-->
-    <header>
-        <!-- Navbar -->
-        <nav class="navbar fixed-top navbar-light white scrolling-navbar">
-            <div class="container">
-                <!-- Brand -->
-                <a class="navbar-brand waves-effect" href="https://mdbootstrap.com/material-design-for-bootstrap/" target="_blank">
-                    <strong id="title" class="black-text">Quoted</strong>
-                </a>
-                <!-- Login Button -->
-                <a id="navbar-static-login" class="btn btn-info btn-sm" data-toggle="modal" data-target="#navbarLogin">Log In<i class="fa fa-sign-in ml-2"></i></a>
+  <header>
+    <nav class="navbar fixed-top navbar-light white scrolling-navbar">
+      <div class="container">
+        <a class="navbar-brand waves-effect">
+          <strong id="title" class="black-text">Quoted</strong>
+        </a>
+      </div>
+    </nav>
+  </header>
+  <main class="mt-5 pt-5">
+    <div id ="signDiv" class="visibleArea container ">
+      <section class="text-center">
+        <div class="row mb-4 justify-content-md-center">
+          <div class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <form class="text-center border border-light p-5">
+                  <p class="h4 mb-4">Sign in</p>
+                  <input type="text" id="signDiv-username" class="form-control mb-4" placeholder="Username">
+                  <input type="password" id="signDiv-password" class="form-control mb-4" placeholder="Password">
+                  <p id="alertArea" class="hiddenArea lead">Sample</p>
+                  <div id="introButtonWrapper" class="visibleArea">
+                    <button id="signDiv-signIn" class="btn btn-info btn-block my-4">Sign in</button>
+                    <button id="signDiv-signUp" class="btn btn-secondary btn-block my-4">Sign up</button>
+                  </div>
+                  <div id="continueButtonWrapper" class="hiddenArea">
+                    <button id="signDiv-continue" class="btn btn-info btn-block my-4" >Continue</button>
+                  </div>
+                </form>
+              </div>
             </div>
-        </nav>
-        <!-- Navbar -->
+          </div>
+        </div>
+      </seciton>
+    </div>
 
-    </header>
-    <!--Main Navigation-->
-
-    <!--Main layout-->
-    <main class="mt-5 pt-5">
-        <div id ="gameWrapper" class="hiddenArea container">
+        <div id ="gameDiv" class="hiddenArea container">
             <section class="text-center">
                 <div class="row mb-4 wow fadeIn">
                     <div class="col-md-6 mb-4">
-                      <div class="card">
+                      <div class="card cardLeft">
                         <div class="card-body">
                           <h4 id="chatTitle" class="card-title">Chat Room</h4>
                           <div class="row">
                             <div class="col">
-                              <div class="labelFor">Chat Room</div>
+                              <div class="labelFor">Current Players: <span id ="currentPlayers">1</span></div>
                             </div>
                           </div>
                           <div class="row">
-                            <div class="col" style:"float: none; margin: 0 auto;">
+                            <div class="col">
                               <div id="chat-text" style="height:200px;overflow:hidden" class = "text-left border border-light" >
-                                <span>hello</span>
                               </div>
                               <form id="chat-form">
                                   <input id="chat-input" type="text" style="width:100%;"></input>
@@ -56,80 +71,33 @@
                             </div>
                           </div>
                             <!-- End Chat Section -->
-                          <div class="row">
-                            <div id="playerData" class="col"></div>
-                          </div>
-                          <h4 id="playerListTitle" class="card-title">Players</h4>
                         </div>
                       </div>
                     </div>
-                    <div class="card">
+
+                    <div class="card cardRight">
                       <div class="card-body">
                         <h4 id="quoteArea" class="card-title">Quote Goes Here and here looloolo</h4>
-                        <p id="feedbackArea" class="card-text"></p
-                        <form class="text-center border border-light p-5">
-                          <input id="submit-input-answer" type="text" class="form-control mb-4" style="width:300px" placeholder="Guess"></input>
-                        </form>
-                        <a href="https://mdbootstrap.com/automated-app-start/" target="_blank" class="btn btn-primary btn-md">Submit Answer</a>
+                        <p id="feedbackArea" class="card-text"></p>
+                        <div class="row justify-content-md-center">
+                          <input id="submit-input-answer" type="text" class="form-control" style="width:300px" placeholder="Guess"></input>
+                        </div>
+                        <a id="submit-input-button" class="btn btn-primary btn-md">Submit<span id="submit-timer"></span></a>
                       </div>
                     </div>
                 </div>
             </section>
         </div>
-        <div id="signDiv" class="visibleArea">
-          <div class="row">
-            <div class="col">
-              <p class="labelArea">USERNAME</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <input id="signDiv-username" placeholder="username" type="text"></input>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <p class="labelFor">PASSWORD</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <input id="signDiv-password" type="password"></input>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <p id="alertArea" class="hiddenArea"></p>
-            </div>
-          </div>
-          <div class="row">
-            <div id="introButtonWrapper" class="col visibleArea">
-              <button id="signDiv-signIn">Sign In</button>
-              <button id="signDiv-signUp">Sign Up</button>
-            </div>
-            <div id="continueButtonWrapper" class="col hiddenArea">
-              <button id="signDiv-continue">Continue</button>
-            </div>
-          </div>
-        </div>
     </main>
-
-    <footer class="page-footer text-center font-small mdb-color darken-2 mt-4 wow fadeIn">
-        <div class="pt-4">
-            <a class="btn btn-outline-white" href="https://github.com/BrentVanZant1999" role="button">
-              <span>Check out my Github</span>
-                <i class="fa fa-github mr-3"></i>
-            </a>
-        </div>
-        <hr class="my-4">
-        <div class="footer-copyright py-3">
-            Left Away Development - Brent VanZant
-        </div>
-    </footer>
-    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-    <script type="text/javascript" src="js/popper.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/mdb.min.js"></script>
-    <script type="text/javascript" src="js/gameHandle.js"></script>
 </body>
+<footer class="page-footer text-center font-small info-color darken-2 mt-4 fixed-bottom">
+    <div class="footer-copyright py-3">
+          <a class="btn btn-outline-white" href="https://github.com/BrentVanZant1999" role="button">
+            <span>Check out my Github</span>
+          <i class="fa fa-github mr-3"></i></a>
+        Left Away Development - Brent VanZant
+    </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+<script type="text/javascript" src="js/gameHandle.js"></script>
 </html>
