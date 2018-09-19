@@ -1,310 +1,99 @@
 <!DOCTYPE html>
-<meta charset="ASCII">
-<title>Quoted</title>
+<html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="author" content="Brent VanZant">
-  <!-- Bootstrap core CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
-  <!-- JQuery -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <!-- Bootstrap core JavaScript -->
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/game.css">
-  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Quoted</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/mdb.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
 </head>
 
 <body>
-  <div id="gameWrapper">
-    <div class="row">
-      <div class="col">
-        <div>
-          <p id="title">Quoted <span id="roomDisplay" class="subtitle neutralColor"></span></p>
-        </div>
-        <!-- Sign In Handling -->
-        <div id="signDiv" class="visibleArea">
-          <div class="row">
-            <div class="col">
-              <p class="labelArea">USERNAME</p>
+    <!--Main Navigation-->
+    <header>
+        <!-- Navbar -->
+        <nav class="navbar fixed-top navbar-light white scrolling-navbar">
+            <div class="container">
+                <!-- Brand -->
+                <a class="navbar-brand waves-effect" href="https://mdbootstrap.com/material-design-for-bootstrap/" target="_blank">
+                    <strong class="black-text">Quoted</strong>
+                </a>
+                <!-- Login Button -->
+                <a id="navbar-static-login" class="btn btn-info btn-sm" data-toggle="modal" data-target="#navbarLogin">Log In<i class="fa fa-sign-in ml-2"></i></a>
             </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <input id="signDiv-username" placeholder="username" type="text"></input>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <p class="labelFor">PASSWORD</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <input id="signDiv-password" type="password"></input>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <p id="alertArea" class="hiddenArea"></p>
-            </div>
-          </div>
-          <div class="row">
-            <div id="introButtonWrapper" class="col visibleArea">
-              <button id="signDiv-signIn">Sign In</button>
-              <button id="signDiv-signUp">Sign Up</button>
-            </div>
-            <div id="continueButtonWrapper" class="col hiddenArea">
-              <button id="signDiv-continue">Continue</button>
-            </div>
-          </div>
-        </div>
-        <!--Sign in Div end -->
-        <!-- Game Div  start -->
-        <div id="gameDiv" class="hiddenArea" >
-          <div class="row">
-            <div class="col">
-              <div id="quoteArea">"I am a quote"</div>
-            </div>
-          </div>
-          <!-- Answer Entering -->
-          <div class="row">
-            <div class="col">
-              <div id="feedbackArea" class="negativeColor hiddenArea"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <input id="submit-input-answer" placeholder="guess" type="text" style="width:300px"></input>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button id="submit-input-button">Submit<span id="submit-timer"></span></button>
-            </div>
-          </div>
-          <!-- End Answer Entering -->
-          <!-- Chat Section -->
-          <div class="row">
-            <div class="col">
-              <div class="labelFor">Chat Room</div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <div id="chat-text" style="width:300px;height:200px;overflow:hidden">
-                <span>hello</span>
-              </div>
-              <form id="chat-form">
-                  <input id="chat-input" type="text" style="width:300px"></input>
-              </form>
-            </div>
-          </div>
-            <!-- End Chat Section -->
-          <div class="row">
-            <div id="playerData" class="col"></div>
-          </div>
+        </nav>
+        <!-- Navbar -->
 
+    </header>
+    <!--Main Navigation-->
+
+    <!--Main layout-->
+    <main class="mt-5 pt-5">
+        <div class="container">
+            <section class="text-center">
+                <div class="row mb-4 wow fadeIn">
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <h4 id="chatTitle" class="card-title">Chat Room</h4>
+                          <div class="row">
+                            <div class="col">
+                              <div class="labelFor">Chat Room</div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col" style:"float: none; margin: 0 auto;">
+                              <div id="chat-text" style="height:200px;overflow:hidden" class = "text-left border border-light" >
+                                <span>hello</span>
+                              </div>
+                              <form id="chat-form">
+                                  <input id="chat-input" type="text" style="width:100%;"></input>
+                              </form>
+                            </div>
+                          </div>
+                            <!-- End Chat Section -->
+                          <div class="row">
+                            <div id="playerData" class="col"></div>
+                          </div>
+                          <h4 id="playerListTitle" class="card-title">Players</h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 id="quoteArea" class="card-title">Quote Goes Here and here looloolo</h4>
+                        <p id="feedbackArea" class="card-text"></p
+                        <form class="text-center border border-light p-5">
+                          <input id="submit-input-answer" type="text" class="form-control mb-4" style="width:300px" placeholder="Guess"></input>
+                        </form>
+                        <a href="https://mdbootstrap.com/automated-app-start/" target="_blank" class="btn btn-primary btn-md">Submit Answer</a>
+                      </div>
+                    </div>
+                </div>
+            </section>
         </div>
-        <!-- Game Div end -->
-      </div>
-    </div>
-  </div>
+    </main>
+
+    <footer class="page-footer text-center font-small mdb-color darken-2 mt-4 wow fadeIn">
+        <div class="pt-4">
+            <a class="btn btn-outline-white" href="https://github.com/BrentVanZant1999" role="button">
+              <span>Check out my Github</span>
+                <i class="fa fa-github mr-3"></i>
+            </a>
+        </div>
+        <hr class="my-4">
+        <div class="footer-copyright py-3">
+            Left Away Development - Brent VanZant
+        </div>
+    </footer>
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+    <script type="text/javascript" src="js/gameHandle.js"></script>
 </body>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-<script>
-  var socket = io();
-  var isPlaying = false;
-  //main game divs
-  var signDiv = document.getElementById('signDiv');
-  var gameDiv = document.getElementById('gameDiv');
-
-  var signDivUsername = document.getElementById('signDiv-username');
-  var signDivSignIn = document.getElementById('signDiv-signIn');
-  var signDivSignUp = document.getElementById('signDiv-signUp');
-  var signDivPassword = document.getElementById('signDiv-password');
-  var signDivInputs = document.getElementById('introButtonWrapper');
-  var signDivContinue = document.getElementById('continueButtonWrapper');
-  var alertArea = document.getElementById('alertArea');
-  var playerData = document.getElementById('playerData');
-  var timerData = document.getElementById('timerData');
-  //handle continue button being clicked - take user to next room
-  signDivContinue.onclick =  function(){
-    socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
-  }
-
-  //handle signing in button
-  signDivSignIn.onclick = function(){
-    if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
-      socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
-    }
-    else {
-      alertArea.classList.remove('hiddenArea');
-      alertArea.classList.add('visibleArea');
-      alertArea.classList.add('neutralColor');
-      alertArea.innerHTML = "Fields Missing";
-    }
-  }
-  //handling sign up button
-  signDivSignUp.onclick = function(){
-    if ( (signDivUsername.value.length > 0) && (signDivPassword.value.length > 0) ) {
-      socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
-    }
-    else {
-      alertArea.classList.remove('hiddenArea');
-      alertArea.classList.add('visibleArea');
-      alertArea.classList.add('neutralColor');
-      alertArea.innerHTML = "Fields Missing";
-    }
-  }
-  //handle clearing list of players
-  socket.on('clearPlayerList',function(data){
-    //clear the list of players
-      playerData.innerHTML = "";
-  });
-
-  //handle displaying players
-  socket.on('displayPlayer',function(data){
-    var playerInfo = data.name + "- " + data.points + " points";
-    console.log(playerInfo);
-    playerData.innerHTML += '<div>' + playerInfo + '</div>';
-  });
-
-  //handle recieving a response from sign in call
-  socket.on('signInResponse',function(data){
-    if(data.success){
-      signDiv.classList.remove('visibleArea');
-      signDiv.classList.add('hiddenArea');
-      gameDiv.classList.remove('hiddenArea');
-      gameDiv.classList.add('visibleArea');
-      isPlaying = true;
-    } else
-      alertArea.classList.remove('hiddenArea');
-      alertArea.classList.add('visibleArea');
-      alertArea.classList.add('neutralColor');
-      alertArea.innerHTML = "Login Incorrect";
-  });
-
-
-  //handle sign up respose
-  socket.on('signUpResponse',function(data){
-    if(data.success){
-      alertArea.classList.remove('hiddenArea');
-      alertArea.classList.add('visibleArea');
-      alertArea.classList.remove('neutralColor');
-      alertArea.classList.add('positiveColor');
-      alertArea.innerHTML = "Sign Up Complete";
-      signDivInputs.classList.remove('visibleArea');
-      signDivInputs.classList.add('hiddenArea');
-      signDivContinue.classList.remove('hiddenArea');
-      signDivContinue.classList.add('visibleArea');
-    }
-    else {
-      alertArea.classList.remove('hiddenArea');
-      alertArea.classList.add('visibleArea');
-      alertArea.innerHTML = "Username already taken";
-    }
-  });
-
-  // define game attributes
-  var chatText = document.getElementById('chat-text');
-  var chatInput = document.getElementById('chat-input');
-  var chatForm = document.getElementById('chat-form');
-  var roomDisplay = document.getElementById('roomDisplay');
-  var playerData = document.getElementById('playerData');
-  var quoteArea = document.getElementById('quoteArea');
-  var feedback = document.getElementById('feedbackArea');
-  var firstPlaceScore = document.getElementById('topData');
-  var inputAnswer = document.getElementById('submit-input-answer');
-  var inputButton = document.getElementById('submit-input-button');
-  var inputTimer = document.getElementById('submit-timer');
-
-  //handle answer submission
-  inputButton.onclick = function() {
-    var inputVal = inputAnswer.value;
-    socket.emit('answerSubmit', { answer : inputVal });
-    inputAnswer.value = "";
-  }
-
-  //handle chat submission
-  socket.on('addToChat',function(data) {
-    chatText.innerHTML += '<div>' + data + '</div>';
-  });
-
-  //handle answer feedback
-  socket.on('correctAnswerDisplay',function(data) {
-    feedback.innerHTML = data.display;
-  });
-
-
-  //update the room being displayed to the user
-  socket.on('changeRoom',function(data) {
-    selectDiv.classList.remove('visibleArea');
-    selectDiv.classList.add('hiddenArea');
-    gameDiv.classList.remove('hiddenArea');
-    gameDiv.classList.add('visibleArea');
-    //handle text
-    chatText.innerHTML = "";
-    console.log(data.roomName);
-    roomDisplay.innerHTML = data.roomName;
-  });
-
-  //handle displaying quote
-  socket.on('stringToDisplay',function(data) {
-    feedback.classList.remove('hiddenArea');
-    feedback.classList.add('visibleArea');
-    feedback.classList.remove('negativeColor');
-    feedback.classList.remove('positiveColor');
-    feedback.classList.add('negativeColor');
-    quoteArea.innerHTML = data.display;
-  });
-
-  //handle displaying time left
-  socket.on('timeLeft',function(data) {
-    if (data.displayBool === true) {
-      inputTimer.innerHTML = " ("+data.displayString+ "s)";
-    }
-    else {
-        inputTimer.innerHTML = "";
-    }
-  });
-
-  //handle other feedback
-  socket.on('feedBack',function(data) {
-    var boolDisplay = data.displayBool;
-    if ( boolDisplay == true ) {
-      feedback.classList.remove('hiddenArea');
-      feedback.classList.add('visibleArea');
-      feedback.classList.remove('negativeColor');
-      feedback.classList.remove('positiveColor');
-      feedback.classList.add('positiveColor');
-    }
-    else {
-      feedback.classList.remove('visibleArea');
-      feedback.classList.add('hiddenArea');
-    }
-    feedback.innerHTML = data.displayValue;
-  });
-
-  //handle other feedback
-  socket.on('rightAnswer',function(data) {
-    feedback.classList.remove('hiddenArea');
-    feedback.classList.add('visibleArea');
-    feedback.classList.remove('negativeColor');
-    feedback.classList.remove('positiveColor');
-    feedback.classList.add('positiveColor');
-    feedback.innerHTML = data.displayString;
-  });
-
-
-  //
-  chatForm.onsubmit = function(e) {
-    e.preventDefault();
-    if(chatInput.value[0] === '/')
-      socket.emit('evalServer',chatInput.value.slice(1));
-    else
-      socket.emit('sendMsgToServer',chatInput.value);
-    chatInput.value = '';
-  }
-</script>
+</html>
