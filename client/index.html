@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,11 +13,17 @@
 
 <body>
   <header>
-    <nav class="navbar fixed-top navbar-light white scrolling-navbar">
+    <nav class="navbar fixed-top info-color darken-2 scrolling-navbar">
       <div class="container">
-        <a class="navbar-brand waves-effect">
-          <strong id="title" class="black-text">Quoted</strong>
-        </a>
+        <h4 class="navbar-brand">
+          <strong id="title" class="white-text">Quoted</strong>
+        </h4>
+        <div class="white-text">
+            Left Away Development - Brent VanZant
+            <a class="btn btn-outline-white" href="https://github.com/BrentVanZant1999" role="button">
+              <span>Check out my Github</span>
+            <i class="fa fa-github mr-3"></i></a>
+        </div>
       </div>
     </nav>
   </header>
@@ -51,14 +56,14 @@
 
         <div id ="gameDiv" class="hiddenArea container">
             <section class="text-center">
-                <div class="row mb-4 wow fadeIn">
+                <div class="row mb-4 wow fadeIn justify-content-md-center">
                     <div class="col-md-6 mb-4">
                       <div class="card cardLeft">
                         <div class="card-body">
                           <h4 id="chatTitle" class="card-title">Chat Room</h4>
                           <div class="row">
                             <div class="col">
-                              <div class="labelFor">Current Players: <span id ="currentPlayers">1</span></div>
+                              <div class="labelFor">Current Players: <span id ="currentPlayers"></span></div>
                             </div>
                           </div>
                           <div class="row">
@@ -70,19 +75,19 @@
                               </form>
                             </div>
                           </div>
-                            <!-- End Chat Section -->
                         </div>
                       </div>
                     </div>
 
                     <div class="card cardRight">
                       <div class="card-body">
-                        <h4 id="quoteArea" class="card-title">Quote Goes Here and here looloolo</h4>
+                        <h4 id="quoteArea" class="card-title"></h4>
                         <p id="feedbackArea" class="card-text"></p>
                         <div class="row justify-content-md-center">
                           <input id="submit-input-answer" type="text" class="form-control" style="width:300px" placeholder="Guess"></input>
                         </div>
                         <a id="submit-input-button" class="btn btn-primary btn-md">Submit<span id="submit-timer"></span></a>
+                        <p id="playerData" class="card-text"></p>
                       </div>
                     </div>
                 </div>
@@ -90,14 +95,6 @@
         </div>
     </main>
 </body>
-<footer class="page-footer text-center font-small info-color darken-2 mt-4 fixed-bottom">
-    <div class="footer-copyright py-3">
-          <a class="btn btn-outline-white" href="https://github.com/BrentVanZant1999" role="button">
-            <span>Check out my Github</span>
-          <i class="fa fa-github mr-3"></i></a>
-        Left Away Development - Brent VanZant
-    </div>
-</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 <script type="text/javascript" src="js/gameHandle.js"></script>
 </html>

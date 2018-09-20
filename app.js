@@ -106,11 +106,17 @@ var Game = function(typeNum){
   //add a player to count
   self.addPlayer = function(){
     self.playerCount++;
+    for (var i in GAME_LIST) {
+      GAME_LIST[i].emit('playerCountUpdate', { count : self.playerCount } );
+    }
   }
 
   //remove a player from count
   self.removePlayer = function(){
     self.playerCount--;
+    for (var i in GAME_LIST) {
+      GAME_LIST[i].emit('playerCountUpdate', { count : self.playerCount } );
+    }
   }
 
   //get a new quote
@@ -118,7 +124,6 @@ var Game = function(typeNum){
     var randomQuoteNum = Math.floor( Math.random() * QUOTE_LIST.length );
     self.currentString  = QUOTE_LIST[randomQuoteNum];
     self.acceptedAnswer  = ANSWER_LIST[randomQuoteNum];
-    console.log("Accepted Answer :" + self.acceptedAnswer);
   }
 
   //through displayString
@@ -168,7 +173,6 @@ var Game = function(typeNum){
       self.msLeft = 1000;
       self.handleSecond();
     }
-    self.displayLeaderBoard();
     self.displayString();
   }
 
@@ -191,12 +195,14 @@ var Game = function(typeNum){
           self.internalTime = 30;
           self.getNewQuote();
           self.newRound();
-          self.displayLeaderBoard();
+          if (self.round > 1) {
+            self.displayLeader();
+          }
         }
         else {
           //setup time to set new game
           self.newGame();
-          self.displayLeaderBoard();
+          self.displayWinner();
           self.isWaitingForGame = true;
           self.externalTime = 10;
           self.round = 1;
@@ -226,18 +232,49 @@ var Game = function(typeNum){
   }
 
   //display top player
-  self.displayLeaderBoard = function(){
+  self.displayLeader = function(){
+    console.log("inLeader");
+    var currentHigh = -1;
+    var isTied = false;
+    var current = undefined;
     for (var i in GAME_LIST) {
-      GAME_LIST[i].emit('clearPlayerList', { boolDisplay:false });
-
       if (Player.list[i] != undefined ) {
         var displaySocketName = Player.list[i].name;
-        var displaySocketPoints = Player.list[i].points;
-        var counter = 0
-        for (var i in GAME_LIST) {
-          GAME_LIST[i].emit('displayPlayer', { name:displaySocketName, points: displaySocketPoints });
-       }
+        if (Player.list[i].points > currentHigh) {
+          current = i;
+          currentHigh = Player.list[i].points;
+          isTied = false;
+        }
+        if (Player.list[i].points === currentHigh) {
+          current = i;
+          isTied = true;
+        }
      }
+    }
+    for (var i in GAME_LIST) {
+      if (current != undefined && Player.list[current] != undefined) {
+        GAME_LIST[i].emit('displayLeader', { name:Player.list[current].name, points:Player.list[current].points, tied: isTied });
+      }
+    }
+  }
+
+  //display winning player of the game
+  self.displayWinner = function(){
+    var currentHigh = -1;
+    var current = undefined;
+    for (var i in GAME_LIST) {
+      if (Player.list[i] != undefined ) {
+        var displaySocketName = Player.list[i].name;
+        if (Player.list[i].points >= currentHigh) {
+          current = i;
+          currentHigh = Player.list[i].points;
+        }
+      }
+    }
+    for (var i in GAME_LIST) {
+      if (current != undefined && Player.list[current] != undefined) {
+        GAME_LIST[i].emit('displayWinner', { name:Player.list[current].name, points:Player.list[current].points });
+      }
     }
   }
 
@@ -297,10 +334,16 @@ var Player = function(id, playerName){
     var self = Entity();
     self.id = id;
     self.name=playerName;
-   self.points = 0;
+    self.points = 0;
     self.rank = 0;
     self.hasAnswered = false;
-    //handle a players submission
+
+    //handle displaying player data to user
+    self.displaySelf = function(){
+      GAME_LIST[self.id].emit('displayPlayer', { points: self.points, name: self.name } );
+    }
+
+    //handle a players answer submission
     self.handleSubmission = function( answer, socket ){
       var answerFiltered = answer.toLowerCase();
       var displayString = "";
@@ -347,6 +390,7 @@ Player.list = {};
 Player.onConnect = function(socket, playerName){
     var player = Player(socket.id, playerName);
     //call to handle room movement
+    game.addPlayer();
     gotoRoom(socket);
     //handle showing player in chat
     for(var i in GAME_LIST){

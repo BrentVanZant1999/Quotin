@@ -13,6 +13,7 @@ var signDivContinue = document.getElementById('continueButtonWrapper');
 var alertArea = document.getElementById('alertArea');
 var playerData = document.getElementById('playerData');
 var timerData = document.getElementById('timerData');
+var currentPlayerData = document.getElementById('currentPlayers');
 //handle continue button being clicked - take user to next room
 signDivContinue.onclick =  function(){
   socket.emit('continue',{username:signDivUsername.value,password:signDivPassword.value});
@@ -45,16 +46,17 @@ signDivSignUp.onclick = function(){
   }
   return false;
 }
-//handle clearing list of players
-socket.on('clearPlayerList',function(data){
-  //clear the list of players
-    playerData.innerHTML = "";
+
+//handle displaying player info
+socket.on('displayPlayer',function(data){
+  var playerInfo = "You have " + data.points + " points.";
+  playerData.innerHTML = playerInfo;
 });
 
-//handle displaying players
-socket.on('displayPlayer',function(data){
-  var playerInfo = data.name + "- " + data.points + " points";
-  playerData.innerHTML += '<div>' + playerInfo + '</div>';
+//handle displaying number of players
+socket.on('playerCountUpdate', function(data){
+  var countNum = data.count;
+  currentPlayerData.innerHTML = countNum;
 });
 
 //handle recieving a response from sign in call
@@ -171,8 +173,16 @@ socket.on('rightAnswer',function(data) {
   feedback.innerHTML = data.displayString;
 });
 
+//socket display leaders
+socket.on('displayLeader',function(data) {
+  chatText.innerHTML += '<div class="text-success">' + data.name +" is in first with "+ data.points+ " points."+'</div>';
+});
+//socket display leaders
+socket.on('displayWinner',function(data) {
+  chatText.innerHTML += '<div class="text-success">'+ "GAME: "+ data.name +" won with "+ data.points+ " points."+'</div>';
+});
 
-//
+//handle chat form submitting
 chatForm.onsubmit = function(e) {
   e.preventDefault();
   if(chatInput.value[0] === '/')
