@@ -12,9 +12,6 @@ app.get('/',function(req, res) {
 });
  serv.listen(PORT);
 
- //used to show successful start
-console.log("Server Started");
-
 //lists to keep track of sockets
 var SOCKET_LIST = {};
 var GENERAL_LIST = {};
@@ -102,13 +99,19 @@ var Game = function(typeNum){
       internalTime:30,
       externalTime:10,
   }
+  self.countPlayers = function(){
+    var counter = 0;
+    for (var i in GAME_LIST) {
+      counter++;
 
+    }
+    for (var i in GAME_LIST) {
+        GAME_LIST[i].emit('playerCountUpdate', { count : counter } );
+    }
+  }
   //add a player to count
   self.addPlayer = function(){
     self.playerCount++;
-    for (var i in GAME_LIST) {
-      GAME_LIST[i].emit('playerCountUpdate', { count : self.playerCount } );
-    }
   }
 
   //remove a player from count
@@ -168,6 +171,7 @@ var Game = function(typeNum){
 
   //pass a specific value of time
   self.passTime = function(timePassed){
+    self.countPlayers();
     self.msLeft -= timePassed;
     if ( self.msLeft <= 0 ) {
       self.msLeft = 1000;
@@ -187,6 +191,7 @@ var Game = function(typeNum){
     }
     else {
       self.internalTime--;
+      self.displayPlayers();
       self.showTimeLeft();
       if ( self.internalTime <= 0) {
         self.round++;
@@ -207,6 +212,15 @@ var Game = function(typeNum){
           self.externalTime = 10;
           self.round = 1;
         }
+      }
+    }
+  }
+
+  //display player values
+  self.displayPlayers = function(){
+    for (var i in GAME_LIST) {
+      if (Player.list[i] != undefined) {
+        Player.list[i].displaySelf();
       }
     }
   }
@@ -233,7 +247,6 @@ var Game = function(typeNum){
 
   //display top player
   self.displayLeader = function(){
-    console.log("inLeader");
     var currentHigh = -1;
     var isTied = false;
     var current = undefined;
@@ -340,7 +353,7 @@ var Player = function(id, playerName){
 
     //handle displaying player data to user
     self.displaySelf = function(){
-      GAME_LIST[self.id].emit('displayPlayer', { points: self.points, name: self.name } );
+      GAME_LIST[self.id].emit('displayPlayer', { points: self.points } );
     }
 
     //handle a players answer submission
@@ -407,6 +420,7 @@ Player.onConnect = function(socket, playerName){
 Player.onDisconnect = function(socket){
     game.removePlayer();
     delete Player.list[socket.id];
+    delete GAME_LIST[socket.id];
 }
 
 //user holding structure

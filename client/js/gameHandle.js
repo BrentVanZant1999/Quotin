@@ -107,7 +107,7 @@ var firstPlaceScore = document.getElementById('topData');
 var inputAnswer = document.getElementById('submit-input-answer');
 var inputButton = document.getElementById('submit-input-button');
 var inputTimer = document.getElementById('submit-timer');
-
+var currentPlayers = document.getElementById('currentPlayers');
 //handle answer submission
 inputButton.onclick = function() {
   var inputVal = inputAnswer.value;
@@ -173,10 +173,16 @@ socket.on('rightAnswer',function(data) {
   feedback.innerHTML = data.displayString;
 });
 
+//displau amount of players
+socket.on('playerCountUpdate',function(data) {
+  currentPlayers.innerHTML = data.count;
+});
+
 //socket display leaders
 socket.on('displayLeader',function(data) {
   chatText.innerHTML += '<div class="text-success">' + data.name +" is in first with "+ data.points+ " points."+'</div>';
 });
+
 //socket display leaders
 socket.on('displayWinner',function(data) {
   chatText.innerHTML += '<div class="text-success">'+ "GAME: "+ data.name +" won with "+ data.points+ " points."+'</div>';
