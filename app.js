@@ -42,7 +42,10 @@ var QUOTE_LIST = [
     "They may take our lives, but they'll never take our freedom!",
     "If you let my daughter go now, that'll be the end of it. I will not look for you, I will not pursue you. But if you don't, I will look for you, I will find you, and I will kill you.",
     "It was Beauty that killed the Beast.",
-    "I'm just one stomach flu away from my goal weight."
+    "I'm just one stomach flu away from my goal weight.",
+    "Rosebud.",
+    "You can't handle the truth",
+    "We rob banks"
 ];
 //answer list to keep tracks of quotes- MUST MATCH QUOTES
 var ANSWER_LIST = [
@@ -69,7 +72,10 @@ var ANSWER_LIST = [
     "Braveheart",
     "Taken",
     "King Kong",
-    "The Devil Wears Prada"
+    "The Devil Wears Prada",
+    "Citizen Kane",
+    "A Few Good Men",
+    "Bonnie and Clyde"
 ];
 
 //some constants
